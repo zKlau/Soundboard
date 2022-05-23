@@ -4,6 +4,7 @@ import time
 from pygame import mixer
 import subprocess
 from pynput.keyboard import Key, Listener, KeyCode
+import json
 '''
 mixer.init(devicename = 'CABLE Input (VB-Audio Virtual Cable)') # Initialize it with the correct device
 mixer.music.load("sounds/suspense.mp3") # Load the mp3
@@ -12,34 +13,13 @@ mixer.music.play() # Play it
 while mixer.music.get_busy():  # wait for music to finish playing
     time.sleep(1)
 '''
-n = True
-online = True
-sound = 0
-mute = 0
 talk = True
 p = None
+sounds = None
 
+with open('json/sounds.json') as json_file:
+    sounds = json.load(json_file)
 
-sound_name = "discord_join.mp3"
-
-key_codes = {
-    "NUM 1": 97,
-    "NUM 2": 98,
-    "NUM 3": 99,
-    "NUM 4": 100,
-    "NUM 5": 101,
-    "NUM 0": 96
-}
-
-# key + sound
-sounds = {
-    key_codes["NUM 1"]: "culcat.mp3",
-    key_codes["NUM 2"]: "discord_join.mp3",
-    key_codes["NUM 3"]: "emotional-damage.mp3",
-    key_codes["NUM 4"]: "oh_he_no.mp3",
-    key_codes["NUM 5"]: "vomit.mp3",
-    key_codes["NUM 0"]: "wow-sound.mp3"
-}
 
 def stopTalking():
     p.terminate()
@@ -60,11 +40,12 @@ def playSound(name):
 
 def on_press(key):
     try:
-        num = key.vk
-        if num in sounds:
-            stopTalking()
-            print("play sound")
-            playSound(sounds[num])
+        for i in range(len(sounds["sounds"])):
+            if key.vk in sounds["sounds"][i].values():
+                stopTalking()
+                playSound(sounds["sounds"][i]["file"])
+                print("play sound")
+                print(sounds["sounds"][i]["name"])
     except:
         pass
         

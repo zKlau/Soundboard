@@ -1,0 +1,35 @@
+{
+    "sounds": [
+        {
+            "id": 0,
+            "name": "WoW Sound",
+            "file": "wow-sound.mp3",
+            "keycode": 96
+            
+        },
+        {
+            "id": 1,
+            "name": "Discord Join",
+            "file": "discord_join.mp3",
+            "keycode": 97
+        },
+        {
+            "id": 2,
+            "name": "Oh He No",
+            "file": "oh_he_no.mp3",
+            "keycode": 100
+        },
+        {
+            "id": 3,
+            "name": "Emotional Damage",
+            "file": "emotional-damage.mp3",
+            "keycode": 99
+        },
+        {
+            "id": 4,
+            "name": "Culcat",
+            "file": "culat.mp3",
+            "keycode": 97
+        }
+    ]
+}
