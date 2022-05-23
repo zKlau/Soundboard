@@ -34,7 +34,7 @@ def playSound(name):
     mixer.music.play() # Play it
     while mixer.music.get_busy():  # wait for music to finish playing
         time.sleep(0.01)
-    startTalking()
+    #startTalking()
 
 
 
@@ -42,9 +42,8 @@ def on_press(key):
     try:
         for i in range(len(sounds["sounds"])):
             if key.vk in sounds["sounds"][i].values():
-                stopTalking()
+                #stopTalking()
                 playSound(sounds["sounds"][i]["file"])
-                print("play sound")
                 print(sounds["sounds"][i]["name"])
     except:
         pass
