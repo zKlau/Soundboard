@@ -17,10 +17,14 @@ talk = True
 p = None
 sounds = None
 
+deviceName = None
 with open('json/sounds.json') as json_file:
     sounds = json.load(json_file)
 
+with open('json/settings.json') as json_file:
+    deviceName = json.load(json_file)
 
+print(deviceName["saved"][0]["outputName"])
 def stopTalking():
     p.terminate()
 def startTalking():
@@ -29,13 +33,12 @@ def startTalking():
 
 def playSound(name):
     global talk
-    mixer.init(devicename = 'CABLE Input (VB-Audio Virtual Cable)') # Initialize it with the correct device
+    mixer.init(devicename = deviceName["saved"][0]["outputName"]) # Initialize it with the correct device
     mixer.music.load("sounds/" + name) # Load the mp3
     mixer.music.play() # Play it
     while mixer.music.get_busy():  # wait for music to finish playing
         time.sleep(0.01)
     #startTalking()
-
 
 
 def on_press(key):

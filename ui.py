@@ -16,13 +16,15 @@ _inputMic = None
 _outputMic = None
 _ins = {}
 _outs = {}
-
+#"Windows DirectSound"
 for i in range(len(sd.query_devices())):
-    if(sd.query_devices()[i]['max_input_channels'] == 2):
-        _ins[sd.query_devices()[i]['name']] = i
-        _outs[sd.query_devices()[i]['name']] = i
+    if(sd.query_devices()[i]['default_samplerate'] == 44100.0):
+        if(sd.query_devices()[i]['max_input_channels'] > 0):
+            _ins[sd.query_devices()[i]['name']] = i
+        else:
+            _outs[sd.query_devices()[i]['name']] = i
         
-
+print(sd.query_devices()[20])
 #print("$$$$$")
 #print(_outs.keys())
 with open('json/keybinds.json') as json_file:
@@ -62,6 +64,7 @@ def saveInOut(input,output):
     for i in range(len(_outs)):
         if list(_outs)[i] == output:
             write_json_inout(_outs[list(_outs)[i]],"outputMic")
+            write_json_inout(output,"outputName")
 
 class GuiApp:
     def __init__(self, master=None):

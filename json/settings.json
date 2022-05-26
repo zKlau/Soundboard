@@ -1,8 +1,9 @@
 {
     "saved": [
         {
-            "inputMic": 20,
-            "outputMic": 2
+            "inputMic": 1,
+            "outputMic": 4,
+            "outputName": "Headphones (High Definition Aud"
         }
     ]
 }

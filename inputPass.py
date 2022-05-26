@@ -3,6 +3,12 @@ import argparse
 import sounddevice as sd
 import numpy  # Make sure NumPy is loaded before it is used in the callback
 assert numpy  # avoid "imported but unused" message (W0611)
+import json
+
+values = None
+with open('json/settings.json') as json_file:
+    values = json.load(json_file)
+
 
 def int_or_str(text):
     """Helper function for argument parsing."""
@@ -46,7 +52,7 @@ def callback(indata, outdata, frames, time, status):
     outdata[:] = indata
 
 try:
-    with sd.Stream(device=(args.input_device, 6),
+    with sd.Stream(device=(values["saved"][0]["inputMic"], values["saved"][0]["outputMic"]),
                    samplerate=args.samplerate, blocksize=args.blocksize,
                    dtype=args.dtype, latency=args.latency,
                    channels=args.channels, callback=callback):
@@ -59,4 +65,4 @@ try:
 except KeyboardInterrupt:
     parser.exit('')
 except Exception as e:
-    parser.exit(type(e).__name__ + ': ' + str(e))
+    print(type(e).__name__ + ': ' + str(e))
