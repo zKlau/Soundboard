@@ -48,6 +48,19 @@
             "file": "D:/1 Projects/Soundboard/sounds/vomit.mp3",
             "keycode": 98,
             "keybind": "c"
+        },
+        {
+            "id": 4,
+            "name": "Culcat sound",
+            "file": "D:/1 Projects/Soundboard/sounds/culcat.mp3",
+            "keycode": 98,
+            "keybind": "NUM_5"
+        }
+    ],
+    "default": [
+        {
+            "inputMic": 1,
+            "outputMic": 6
         }
     ]
 }

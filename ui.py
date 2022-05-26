@@ -1,24 +1,37 @@
 import tkinter as tk
 import tkinter.ttk as ttk
+from numpy import append
 from pygubu.widgets.pathchooserinput import PathChooserInput
 from pygubu.widgets.tkscrolledframe import TkScrolledFrame
 import json
-
+import sounddevice as sd
+import tkinter.font as tkfont
 sounds = None
+
 with open('json/sounds.json') as json_file:
     sounds = json.load(json_file)
 
 keybinds = None
 _inputMic = None
 _outputMic = None
+_ins = {}
+_outs = {}
 
+for i in range(len(sd.query_devices())):
+    if(sd.query_devices()[i]['max_input_channels'] == 2):
+        _ins[sd.query_devices()[i]['name']] = i
+        _outs[sd.query_devices()[i]['name']] = i
+        
 
+#print("$$$$$")
+#print(_outs.keys())
 with open('json/keybinds.json') as json_file:
     keybinds = json.load(json_file)
-print(keybinds["keybinds"][0].keys())
+#print(keybinds["keybinds"][0].keys())
+
 
 def addSound(name,keybind,path):
-    keybind = keybind.replace("'","").replace(',',"")
+    #keybind = keybind.replace("'","").replace(',',"")
     print("added")
     x = {
             "id": 4,
@@ -28,6 +41,27 @@ def addSound(name,keybind,path):
             "keybind": keybind
         }
     write_json(x)
+
+
+
+def combo_configure(event):
+    combo = event.widget
+    style = ttk.Style()
+
+    long = max(combo.cget('values'), key=len)
+
+    font = tkfont.nametofont(str(combo.cget('font')))
+    width = max(0,font.measure(long.strip() + '0') - combo.winfo_width())
+
+    style.configure('TCombobox', postoffset=(0,0,width,0))
+
+def saveInOut(input,output):
+    for i in range(len(_ins)):
+        if list(_ins)[i] == input:
+            write_json_inout(_ins[list(_ins)[i]],"inputMic")
+    for i in range(len(_outs)):
+        if list(_outs)[i] == output:
+            write_json_inout(_outs[list(_outs)[i]],"outputMic")
 
 class GuiApp:
     def __init__(self, master=None):
@@ -67,7 +101,8 @@ class GuiApp:
             text="Input MIC:",
         )
         self.inputMicro.pack(padx="10", side="top")
-        self.inputMic = ttk.Combobox(self.SideMenu)
+        self.inputMic = ttk.Combobox(self.SideMenu,values=list(_ins.keys()))
+        self.inputMic.bind('<Configure>', combo_configure)
         self.inputMic.pack(padx="25", side="top")
 
         _inputMic = self.inputMic.get()
@@ -79,10 +114,17 @@ class GuiApp:
             foreground="#023436",
             text="Output MIC:",
         )
+        self.OutputMic = ttk.Combobox(self.SideMenu,values=list(_outs.keys()))
         self.outputMic.pack(anchor="n", side="top")
-        self.OutputMic = ttk.Combobox(self.SideMenu)
+        self.OutputMic.bind('<Configure>', combo_configure)
         self.OutputMic.pack(anchor="n", side="top")
         _outputMic = self.OutputMic.get()
+
+        self.SaveMics = ttk.Button(self.SideMenu,command=lambda: saveInOut(self.inputMic.get(),self.OutputMic.get()))
+        self.SaveMics.configure(default="normal", text="Save")
+        self.SaveMics.pack(pady="5",side="top")
+
+
         self.label5 = ttk.Label(self.SideMenu)
         self.label5.configure(
             background="#03b5aa", font="{Yu Mincho} 10 {}", text="Version 0.0.1"
@@ -106,10 +148,9 @@ class GuiApp:
         self.soundName.insert("0", _text_)
         self.soundName.pack(pady="10", side="top")
         
-        self.selectKeybind = ttk.Combobox(self.SideMenu, values=keybinds["keybinds"][0].keys())
+        self.selectKeybind = ttk.Combobox(self.SideMenu, values=list(keybinds["keybinds"][0].keys()))
         #self.selectKeybind.v = keybinds["keybinds"]
         self.selectKeybind.pack(side="top")
-        print(self.soundPath)
         self.AddButton = ttk.Button(self.SideMenu,command=lambda: addSound(self.soundName.get(), self.selectKeybind.get(), self.soundPath.cget("path")))
         self.AddButton.configure(default="normal", text="Add")
         self.AddButton.pack(pady="5",side="top")
@@ -166,7 +207,7 @@ def DisplaySound(soundZone):
         playSound.pack(padx="10", side="right")
         delete = ttk.Button(SoundHolder)
         delete.configure(text="X")
-        delete.pack(side="top")
+        delete.pack(side="right")
         SoundHolder.configure(background="#03b5aa", height="25", width="200")
         SoundHolder.pack(pady="5",padx="5",fill="x", side="top")
         SoundHolder.pack_propagate(0)
@@ -181,6 +222,19 @@ def write_json(new_data, filename='json/sounds.json'):
         file.seek(0)
         # convert back to json.
         json.dump(file_data, file, indent = 4)
+ 
+def write_json_inout(new_data, name, filename='json/settings.json'):
+    
+    with open(filename,'r+') as file:
+          # First we load existing data into a dict.
+        file_data = json.load(file)
+        # Join new_data with file_data inside emp_details
+        file_data["saved"][0][name] = new_data
+        # Sets file's current position at offset.
+        file.seek(0)
+        # convert back to json.
+        json.dump(file_data, file, indent = 4)
+        file.truncate()
  
     # python object to be appended
 

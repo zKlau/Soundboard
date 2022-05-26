@@ -3,7 +3,6 @@ import argparse
 import sounddevice as sd
 import numpy  # Make sure NumPy is loaded before it is used in the callback
 assert numpy  # avoid "imported but unused" message (W0611)
-import keyboard
 
 def int_or_str(text):
     """Helper function for argument parsing."""
