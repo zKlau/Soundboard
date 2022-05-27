@@ -34,7 +34,7 @@ def startTalking():
 def playSound(name):
     global talk
     mixer.init(devicename = deviceName["saved"][0]["outputName"]) # Initialize it with the correct device
-    mixer.music.load("sounds/" + name) # Load the mp3
+    mixer.music.load(name) # Load the mp3
     mixer.music.play() # Play it
     while mixer.music.get_busy():  # wait for music to finish playing
         time.sleep(0.01)
@@ -42,12 +42,14 @@ def playSound(name):
 
 
 def on_press(key):
+    print(key.vk)
     try:
         for i in range(len(sounds["sounds"])):
-            if key.vk in sounds["sounds"][i].values():
-                #stopTalking()
-                playSound(sounds["sounds"][i]["file"])
+            if list(sounds["sounds"][i].values())[3] == key.vk :
                 print(sounds["sounds"][i]["name"])
+                
+                playSound(sounds["sounds"][i]["file"])
+                
     except:
         pass
         

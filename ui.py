@@ -6,6 +6,7 @@ from pygubu.widgets.tkscrolledframe import TkScrolledFrame
 import json
 import sounddevice as sd
 import tkinter.font as tkfont
+import subprocess
 sounds = None
 
 with open('json/sounds.json') as json_file:
@@ -16,34 +17,38 @@ _inputMic = None
 _outputMic = None
 _ins = {}
 _outs = {}
+p = None
 #"Windows DirectSound"
 for i in range(len(sd.query_devices())):
-    if(sd.query_devices()[i]['default_samplerate'] == 44100.0):
-        if(sd.query_devices()[i]['max_input_channels'] > 0):
-            _ins[sd.query_devices()[i]['name']] = i
-        else:
-            _outs[sd.query_devices()[i]['name']] = i
+        if(sd.query_devices()[i]['hostapi'] == 1):
+            if(sd.query_devices()[i]['max_input_channels'] > 0):
+                
+                _ins[sd.query_devices()[i]['name']] = i
+            else:
+                    
+                    _outs[sd.query_devices()[i]['name']] = i
         
-print(sd.query_devices()[20])
 #print("$$$$$")
 #print(_outs.keys())
 with open('json/keybinds.json') as json_file:
     keybinds = json.load(json_file)
-#print(keybinds["keybinds"][0].keys())
 
 
 def addSound(name,keybind,path):
-    #keybind = keybind.replace("'","").replace(',',"")
-    print("added")
+    key = None
+    for i in range(len(keybinds['keybinds'][0])):
+        if(list(keybinds['keybinds'][0].keys())[i] == keybind):
+            key = list(keybinds['keybinds'][0].values())[i]
+    
     x = {
-            "id": 4,
+            "id": 0,
             "name": name,
             "file": path,
-            "keycode": 98,
+            "keycode": key,
             "keybind": keybind
         }
     write_json(x)
-
+    print("added")
 
 
 def combo_configure(event):
@@ -65,6 +70,8 @@ def saveInOut(input,output):
         if list(_outs)[i] == output:
             write_json_inout(_outs[list(_outs)[i]],"outputMic")
             write_json_inout(output,"outputName")
+
+
 
 class GuiApp:
     def __init__(self, master=None):
@@ -184,11 +191,23 @@ class GuiApp:
         self.toplevel3.minsize(800, 600)
 
         # Main widget
+        
+        def callback():
+            print("exit")
+            p.terminate()
+            self.toplevel3.destroy()
+
+        self.toplevel3.protocol("WM_DELETE_WINDOW", callback)
+
         self.mainwindow = self.toplevel3
+        p = subprocess.Popen('py mainSound.py')
 
 
     def run(self):
+        
         self.mainwindow.mainloop()
+        
+
 
 def DisplaySound(soundZone):
     for i in range(len(sounds["sounds"])):
@@ -245,3 +264,4 @@ def write_json_inout(new_data, name, filename='json/settings.json'):
 if __name__ == "__main__":
     app = GuiApp()
     app.run()
+    

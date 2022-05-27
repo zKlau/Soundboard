@@ -3,42 +3,42 @@
         {
             "id": 0,
             "name": "WoW Sound",
-            "file": "wow-sound.mp3",
+            "file": "D:/1 Projects/Soundboard/sounds/wow-sound.mp3",
             "keycode": 96,
             "keybind": "NUM 0"
         },
         {
             "id": 1,
             "name": "Discord Join",
-            "file": "discord_join.mp3",
+            "file": "D:/1 Projects/Soundboard/sounds/discord_join.mp3",
             "keycode": 97,
             "keybind": "NUM 1"
         },
         {
             "id": 2,
             "name": "Oh He No",
-            "file": "oh_he_no.mp3",
+            "file": "D:/1 Projects/Soundboard/sounds/oh_he_no.mp3",
             "keycode": 100,
             "keybind": "NUM 4"
         },
         {
             "id": 3,
             "name": "Emotional Damage",
-            "file": "emotional-damage.mp3",
+            "file": "D:/1 Projects/Soundboard/sounds/emotional-damage.mp3",
             "keycode": 99,
             "keybind": "NUM 3"
         },
         {
             "id": 4,
             "name": "Culcat",
-            "file": "culat.mp3",
+            "file": "D:/1 Projects/Soundboard/sounds/culat.mp3",
             "keycode": 98,
             "keybind": "NUM 2"
         },
         {
             "id": 4,
             "name": "Denis",
-            "file": "culat.mp3",
+            "file": "D:/1 Projects/Soundboard/sounds/culat.mp3",
             "keycode": 98,
             "keybind": "NUM 2"
         },
@@ -53,8 +53,22 @@
             "id": 4,
             "name": "Culcat sound",
             "file": "D:/1 Projects/Soundboard/sounds/culcat.mp3",
-            "keycode": 98,
+            "keycode": 101,
             "keybind": "NUM_5"
+        },
+        {
+            "id": 4,
+            "name": "Denis vomita",
+            "file": "D:/1 Projects/Soundboard/sounds/vomit.mp3",
+            "keycode": 98,
+            "keybind": "7"
+        },
+        {
+            "id": 0,
+            "name": "Sound Nametete",
+            "file": "D:/1 Projects/Soundboard/sounds/wow-sound.mp3",
+            "keycode": 57,
+            "keybind": "9"
         }
     ],
     "default": [
