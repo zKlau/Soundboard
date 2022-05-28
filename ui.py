@@ -207,11 +207,17 @@ class GuiApp:
         
         self.mainwindow.mainloop()
         
-
+sh = []
+btns = []
+def removeSound():
+    for i in range(len(btns)):
+        sh[i].destroy()
 
 def DisplaySound(soundZone):
     for i in range(len(sounds["sounds"])):
         SoundHolder = tk.Frame(soundZone.innerframe)
+        sh.append(SoundHolder)
+        thisId = i
         SoundName = ttk.Label(SoundHolder)
         #Name
         SoundName.configure(
@@ -227,12 +233,15 @@ def DisplaySound(soundZone):
         playSound = ttk.Button(SoundHolder)
         playSound.configure(text="Play Sound")
         playSound.pack(padx="10", side="right")
-        delete = ttk.Button(SoundHolder)
-        delete.configure(text="X")
+        delete = ttk.Button(SoundHolder, command=lambda: removeSound())
+        delete.configure(text=i)
+        btns.append(delete)
         delete.pack(side="right")
         SoundHolder.configure(background="#03b5aa", height="25", width="200")
         SoundHolder.pack(pady="5",padx="5",fill="x", side="top")
+        
         SoundHolder.pack_propagate(0)
+
 
 def write_json(new_data, filename='json/sounds.json'):
     with open(filename,'r+') as file:
