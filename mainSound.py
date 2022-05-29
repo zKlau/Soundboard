@@ -63,6 +63,6 @@ while True:
     time.sleep(0.05)
 
     if talk == True:
-        p = subprocess.Popen('inputPass.exe')
-        p1 = subprocess.Popen('ui.exe')
+        p = subprocess.Popen('py inputPass.py') # change to inputPass.exe
+        p1 = subprocess.Popen('py ui.py') # change to ui.exe
         talk = False

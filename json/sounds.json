@@ -1,52 +1,18 @@
 {
     "sounds": [
         {
-            "id": 0,
-            "name": "WoW Sound",
-            "file": "D:/1 Projects/Soundboard/sounds/wow-sound.mp3",
-            "keycode": 96,
-            "keybind": "NUM 0"
-        },
-        {
+            "file": "D:/1 Projects/Soundboard/sounds/rock_sing.mp3",
             "id": 1,
-            "name": "Discord Join",
-            "file": "D:/1 Projects/Soundboard/sounds/discord_join.mp3",
-            "keycode": 97,
-            "keybind": "NUM 1"
+            "keybind": "1",
+            "keycode": 49,
+            "name": "Sound Name"
         },
         {
+            "file": "D:/1 Projects/Soundboard/sounds/rock_sing.mp3",
             "id": 2,
-            "name": "Oh He No",
-            "file": "D:/1 Projects/Soundboard/sounds/oh_he_no.mp3",
-            "keycode": 100,
-            "keybind": "NUM 4"
-        },
-        {
-            "id": 3,
-            "name": "Emotional Damage",
-            "file": "D:/1 Projects/Soundboard/sounds/emotional-damage.mp3",
-            "keycode": 99,
-            "keybind": "NUM 3"
-        },
-        {
-            "id": 4,
-            "name": "Culcat",
-            "file": "D:/1 Projects/Soundboard/sounds/culat.mp3",
-            "keycode": 98,
-            "keybind": "NUM 2"
-        },
-        {
-            "id": 0,
-            "name": "test",
-            "file": "D:/1 Projects/Soundboard/sounds/vomit.mp3",
-            "keycode": 68,
-            "keybind": "d"
-        }
-    ],
-    "default": [
-        {
-            "inputMic": 1,
-            "outputMic": 6
+            "keybind": "v",
+            "keycode": 86,
+            "name": "Sound Name"
         }
     ]
 }

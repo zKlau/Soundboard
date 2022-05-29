@@ -1,6 +1,7 @@
 from asyncio.windows_utils import Popen
 import tkinter as tk
 import tkinter.ttk as ttk
+from turtle import update
 from numpy import append
 from pygubu.widgets.pathchooserinput import PathChooserInput
 from pygubu.widgets.tkscrolledframe import TkScrolledFrame
@@ -9,6 +10,7 @@ import sounddevice as sd
 import tkinter.font as tkfont
 import subprocess
 import sys
+from tkinter import *
 sounds = None
 
 with open('json/sounds.json') as json_file:
@@ -37,19 +39,24 @@ with open('json/keybinds.json') as json_file:
 
 
 def addSound(name,keybind,path):
+    global sounds
+    with open('json/sounds.json') as json_file:
+        sounds = json.load(json_file)
+
     key = None
     for i in range(len(keybinds['keybinds'][0])):
         if(list(keybinds['keybinds'][0].keys())[i] == keybind):
             key = list(keybinds['keybinds'][0].values())[i]
     
     x = {
-            "id": 0,
+            "id": len(sounds['sounds']),
             "name": name,
             "file": path,
             "keycode": key,
             "keybind": keybind
         }
     write_json(x)
+    updateList()
     print("added")
 
 
@@ -73,10 +80,11 @@ def saveInOut(input,output):
             write_json_inout(_outs[list(_outs)[i]],"outputMic")
             write_json_inout(output,"outputName")
 
-
+listZone = None
 
 class GuiApp:
     def __init__(self, master=None):
+        global listZone
         # build ui
         self.toplevel3 = tk.Tk() if master is None else tk.Toplevel(master)
         self.Main = tk.Frame(self.toplevel3)
@@ -178,7 +186,8 @@ class GuiApp:
         self.soundZone = TkScrolledFrame(self.sounds, scrolltype="vertical")
 
         # Sound Holder
-        DisplaySound(self.soundZone)
+        listZone = self.soundZone
+        DisplaySound()
         ################
 
         self.soundZone.innerframe.configure(background="#037971")
@@ -215,15 +224,13 @@ class GuiApp:
         
 sh = []
 btns = []
-def removeSound():
-    for i in range(len(btns)):
-        sh[i].destroy()
+    
+    
 
-def DisplaySound(soundZone):
+def DisplaySound():
     for i in range(len(sounds["sounds"])):
-        SoundHolder = tk.Frame(soundZone.innerframe)
+        SoundHolder = tk.Frame(listZone.innerframe)
         sh.append(SoundHolder)
-        thisId = i
         SoundName = ttk.Label(SoundHolder)
         #Name
         SoundName.configure(
@@ -239,7 +246,7 @@ def DisplaySound(soundZone):
         playSound = ttk.Button(SoundHolder)
         playSound.configure(text="Play Sound")
         playSound.pack(padx="10", side="right")
-        delete = ttk.Button(SoundHolder, command=lambda: removeSound())
+        delete = ttk.Button(SoundHolder, command=lambda c=i: delwrite_json(c) )
         delete.configure(text=i)
         btns.append(delete)
         delete.pack(side="right")
@@ -247,7 +254,26 @@ def DisplaySound(soundZone):
         SoundHolder.pack(pady="5",padx="5",fill="x", side="top")
         
         SoundHolder.pack_propagate(0)
-
+        
+def delwrite_json(toRemoveId, filename='json/sounds.json'):
+    file_data = json.load(open(filename))
+    del file_data["sounds"][toRemoveId]
+    # Join new_data with file_data inside emp_details
+    #file_data["sounds"].append(new_data)
+    
+    #for i in range(len(file_data)):
+    #    if(file_data["sounds"][i]['id'] == toRemoveId):
+    #        file_data["sounds"].pop(i)
+    
+    # Sets file's current position at offset.
+    #file.seek(0)
+    # convert back to json.
+    open(filename, "w").write(
+        json.dumps(file_data, sort_keys=True, indent=4, separators=(',', ': '))
+    )
+    updateList()
+    #json.dump(file_data, file, indent = 4)
+ 
 
 def write_json(new_data, filename='json/sounds.json'):
     with open(filename,'r+') as file:
@@ -275,7 +301,13 @@ def write_json_inout(new_data, name, filename='json/settings.json'):
  
     # python object to be appended
 
-
+def updateList():
+    global sounds
+    with open('json/sounds.json') as json_file:
+        sounds = json.load(json_file)
+    for i in range(len(sh)):
+        sh[i].destroy()
+    DisplaySound()
 if __name__ == "__main__":
     app = GuiApp()
     app.run()
