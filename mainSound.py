@@ -5,6 +5,7 @@ from pygame import mixer
 import subprocess
 from pynput.keyboard import Key, Listener, KeyCode
 import json
+import ui
 '''
 mixer.init(devicename = 'CABLE Input (VB-Audio Virtual Cable)') # Initialize it with the correct device
 mixer.music.load("sounds/suspense.mp3") # Load the mp3
@@ -42,7 +43,6 @@ def playSound(name):
 
 
 def on_press(key):
-    print(key.vk)
     try:
         for i in range(len(sounds["sounds"])):
             if list(sounds["sounds"][i].values())[3] == key.vk :
@@ -59,8 +59,10 @@ listener.start()
 
 print("######### START TALKING #########")
 while True:
+
     time.sleep(0.05)
 
     if talk == True:
-        p = subprocess.Popen('py inputPass.py')
+        p = subprocess.Popen('inputPass.exe')
+        p1 = subprocess.Popen('ui.exe')
         talk = False

@@ -1,3 +1,4 @@
+from asyncio.windows_utils import Popen
 import tkinter as tk
 import tkinter.ttk as ttk
 from numpy import append
@@ -7,6 +8,7 @@ import json
 import sounddevice as sd
 import tkinter.font as tkfont
 import subprocess
+import sys
 sounds = None
 
 with open('json/sounds.json') as json_file:
@@ -193,14 +195,18 @@ class GuiApp:
         # Main widget
         
         def callback():
-            print("exit")
-            p.terminate()
+            #p.terminate()
+            #p2.terminate()
             self.toplevel3.destroy()
+            print("exit")
+            sys.exit()
+            
 
         self.toplevel3.protocol("WM_DELETE_WINDOW", callback)
 
         self.mainwindow = self.toplevel3
-        p = subprocess.Popen('py mainSound.py')
+        #p = subprocess.Popen('mainSound.exe')
+        #p2 = subprocess.Popen('inputPass.exe')
 
 
     def run(self):

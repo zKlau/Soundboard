@@ -5,7 +5,6 @@ import sounddevice as sd
 import soundfile as sf
 
 
-
 def int_or_str(text):
     """Helper function for argument parsing."""
     try:

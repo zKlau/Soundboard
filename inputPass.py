@@ -5,6 +5,7 @@ import numpy  # Make sure NumPy is loaded before it is used in the callback
 assert numpy  # avoid "imported but unused" message (W0611)
 import json
 
+
 values = None
 with open('json/settings.json') as json_file:
     values = json.load(json_file)
