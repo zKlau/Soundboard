@@ -187,6 +187,7 @@ class GuiApp:
 
         # Sound Holder
         listZone = self.soundZone
+        print(listZone.innerframe)
         DisplaySound()
         ################
 

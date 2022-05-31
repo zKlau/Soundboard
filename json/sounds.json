@@ -1,18 +1,11 @@
 {
     "sounds": [
         {
-            "file": "D:/1 Projects/Soundboard/sounds/rock_sing.mp3",
-            "id": 1,
-            "keybind": "1",
-            "keycode": 49,
-            "name": "Sound Name"
-        },
-        {
-            "file": "D:/1 Projects/Soundboard/sounds/rock_sing.mp3",
-            "id": 2,
-            "keybind": "v",
-            "keycode": 86,
-            "name": "Sound Name"
+            "id": 0,
+            "name": "Vomit",
+            "file": "D:/1 Projects/Soundboard/sounds/vomit.mp3",
+            "keycode": 105,
+            "keybind": "NUM_9"
         }
     ]
 }
