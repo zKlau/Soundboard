@@ -2,10 +2,17 @@
     "sounds": [
         {
             "id": 0,
-            "name": "Vomit",
-            "file": "D:/1 Projects/Soundboard/sounds/vomit.mp3",
-            "keycode": 105,
-            "keybind": "NUM_9"
+            "name": "Sound Name",
+            "file": "D:/1 Projects/Soundboard/sounds/wow-sound.mp3",
+            "keycode": 96,
+            "keybind": "NUM_0"
+        },
+        {
+            "id": 1,
+            "name": "Sound Nameculcat",
+            "file": "C:/Users/claud/Downloads/culcat_HsuqBDm.mp3",
+            "keycode": 67,
+            "keybind": "c"
         }
     ]
 }

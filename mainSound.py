@@ -21,16 +21,6 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from turtle import update
 from numpy import append
-'''
-mixer.init(devicename = 'CABLE Input (VB-Audio Virtual Cable)') # Initialize it with the correct device
-mixer.music.load("sounds/suspense.mp3") # Load the mp3
-mixer.music.play() # Play it
-
-while mixer.music.get_busy():  # wait for music to finish playing
-    time.sleep(1)
-'''
-def stop():
-    sys.exit()
 
 def audioStart():
     values = None
@@ -95,9 +85,54 @@ def audioStart():
     except Exception as e:
         print(type(e).__name__ + ': ' + str(e))
 
-def userInterface():
-    sounds = None
+def startSound():
+    
+    talk = True
+    p = None
+    soundMain = None
 
+    deviceName = None
+    with open('json/sounds.json') as json_file:
+        soundMain = json.load(json_file)
+
+    with open('json/settings.json') as json_file:
+        deviceName = json.load(json_file)
+    print(deviceName["saved"][0]["outputName"])
+    def stopTalking():
+        p.terminate()
+    def startTalking():
+        global talk
+        talk = True
+
+    def playSound(name):
+        global talk
+        mixer.init(devicename = deviceName["saved"][0]["outputName"]) # Initialize it with the correct device
+        mixer.music.load(name) # Load the mp3
+        mixer.music.play() # Play it
+        while mixer.music.get_busy():  # wait for music to finish playing
+            time.sleep(0.01)
+        #startTalking()
+
+
+    def on_press(key):
+        try:
+            for i in range(len(soundMain["sounds"])):
+                if list(soundMain["sounds"][i].values())[3] == key.vk :
+                    print(soundMain["sounds"][i]["name"])
+
+                    playSound(soundMain["sounds"][i]["file"])
+
+        except:
+            pass
+
+
+    listener = Listener(on_press=on_press)
+    listener.start()
+
+    print("######### START TALKING #########")
+
+def user_interface():
+    sounds = None
     with open('json/sounds.json') as json_file:
         sounds = json.load(json_file)
 
@@ -164,8 +199,8 @@ def userInterface():
             if list(_outs)[i] == output:
                 write_json_inout(_outs[list(_outs)[i]],"outputMic")
                 write_json_inout(output,"outputName")
-
-    #listZone = None
+    global listZone
+    listZone = None
 
     class GuiApp:
         def __init__(self, master=None):
@@ -271,9 +306,9 @@ def userInterface():
             self.soundZone = TkScrolledFrame(self.sounds, scrolltype="vertical")
 
             # Sound Holder
-            #listZone = self.soundZone
-            #print(listZone.innerframe)
-            DisplaySound(self.soundZone)
+            listZone = self.soundZone
+            print(listZone.innerframe)
+            DisplaySound()
             ################
 
             self.soundZone.innerframe.configure(background="#037971")
@@ -293,7 +328,8 @@ def userInterface():
                 #p.terminate()
                 #p2.terminate()
                 self.toplevel3.destroy()
-                stop()
+                print("exit")
+                #sys.exit()
 
 
             self.toplevel3.protocol("WM_DELETE_WINDOW", callback)
@@ -312,7 +348,10 @@ def userInterface():
 
 
 
-    def DisplaySound(listZone):
+    def DisplaySound():
+        global sounds
+        with open('json/sounds.json') as json_file:
+            sounds = json.load(json_file)
         for i in range(len(sounds["sounds"])):
             SoundHolder = tk.Frame(listZone.innerframe)
             sh.append(SoundHolder)
@@ -343,21 +382,11 @@ def userInterface():
     def delwrite_json(toRemoveId, filename='json/sounds.json'):
         file_data = json.load(open(filename))
         del file_data["sounds"][toRemoveId]
-        # Join new_data with file_data inside emp_details
-        #file_data["sounds"].append(new_data)
-
-        #for i in range(len(file_data)):
-        #    if(file_data["sounds"][i]['id'] == toRemoveId):
-        #        file_data["sounds"].pop(i)
-
-        # Sets file's current position at offset.
-        #file.seek(0)
-        # convert back to json.
+        
         open(filename, "w").write(
             json.dumps(file_data, sort_keys=True, indent=4, separators=(',', ': '))
         )
         updateList()
-        #json.dump(file_data, file, indent = 4)
     
 
     def write_json(new_data, filename='json/sounds.json'):
@@ -387,9 +416,7 @@ def userInterface():
         # python object to be appended
 
     def updateList():
-        global sounds
-        with open('json/sounds.json') as json_file:
-            sounds = json.load(json_file)
+        
         for i in range(len(sh)):
             sh[i].destroy()
         DisplaySound()
@@ -397,52 +424,7 @@ def userInterface():
         app = GuiApp()
         app.run()
 
-
-def startSound():
-    talk = True
-    p = None
-    soundMain = None
-
-    deviceName = None
-    with open('json/sounds.json') as json_file:
-        soundMain = json.load(json_file)
-
-    with open('json/settings.json') as json_file:
-        deviceName = json.load(json_file)
-    print(deviceName["saved"][0]["outputName"])
-    def stopTalking():
-        p.terminate()
-    def startTalking():
-        global talk
-        talk = True
-
-    def playSound(name):
-        global talk
-        mixer.init(devicename = deviceName["saved"][0]["outputName"]) # Initialize it with the correct device
-        mixer.music.load(name) # Load the mp3
-        mixer.music.play() # Play it
-        while mixer.music.get_busy():  # wait for music to finish playing
-            time.sleep(0.01)
-        #startTalking()
-
-
-    def on_press(key):
-        try:
-            for i in range(len(soundMain["sounds"])):
-                if list(soundMain["sounds"][i].values())[3] == key.vk :
-                    print(soundMain["sounds"][i]["name"])
-
-                    playSound(soundMain["sounds"][i]["file"])
-
-        except:
-            pass
-
-
-    listener = Listener(on_press=on_press)
-    listener.start()
-
-    print("######### START TALKING #########")
-p1 = threading.Thread(target=userInterface)
+p1 = threading.Thread(target=user_interface)
 p = threading.Thread(target=audioStart, daemon=True)
 p2 = threading.Thread(target=startSound, daemon=True)
 p.start()
