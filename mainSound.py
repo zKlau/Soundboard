@@ -22,6 +22,11 @@ import tkinter.ttk as ttk
 from turtle import update
 from numpy import append
 
+global volume
+with open('json/settings.json') as json_file:
+    defaultVolume = json.load(json_file)
+    volume = defaultVolume["saved"][0]["micVolume"]
+
 def audioStart():
     values = None
     with open('json/settings.json') as json_file:
@@ -67,7 +72,7 @@ def audioStart():
     def callback(indata, outdata, frames, time, status):
         if status:
             print(status)
-        outdata[:] = indata
+        outdata[:] = indata * volume
 
     try:
         with sd.Stream(device=(values["saved"][0]["inputMic"], values["saved"][0]["outputMic"]),
@@ -86,7 +91,6 @@ def audioStart():
         print(type(e).__name__ + ': ' + str(e))
 
 def startSound():
-    
     talk = True
     p = None
     soundMain = None
@@ -116,6 +120,8 @@ def startSound():
 
     def on_press(key):
         try:
+            with open('json/sounds.json') as json_file:
+                soundMain = json.load(json_file)
             for i in range(len(soundMain["sounds"])):
                 if list(soundMain["sounds"][i].values())[3] == key.vk :
                     print(soundMain["sounds"][i]["name"])
@@ -157,6 +163,11 @@ def user_interface():
     with open('json/keybinds.json') as json_file:
         keybinds = json.load(json_file)
 
+    def changeVolume(vol):
+        global volume
+        volume = vol/10
+        write_json_inout(volume,"micVolume")
+        print("Volume set to " + str(vol) + "%")
 
     def addSound(name,keybind,path):
         global sounds
@@ -307,9 +318,37 @@ def user_interface():
 
             # Sound Holder
             listZone = self.soundZone
-            print(listZone.innerframe)
+            #print(listZone.innerframe)
             DisplaySound()
             ################
+
+
+            self.MicVolume = ttk.Label(self.SideMenu)
+            self.MicVolume.configure(
+                background="#03b5aa",
+                font="{Yu Mincho} 12 {bold}",
+                foreground="#023436",
+                text="Microphone volume",
+            )
+            self.MicVolume.pack(pady="10", side="top")
+            self.MicVolumeScale = tk.Scale(self.SideMenu)
+            self.MicVolumeScale.configure(
+                activebackground="#023436",
+                background="#03b5aa",
+                borderwidth="5",
+                font="{Yu Mincho} 12 {}",
+            )
+            self.MicVolumeScale.configure(
+                foreground="#023436",
+                highlightbackground="#03b5aa",
+                highlightcolor="#023436",
+                orient="horizontal",
+            )
+            self.MicVolumeScale.configure(relief="raised", troughcolor="#049a8f")
+            self.MicVolumeScale.pack(ipadx="25", side="top")
+            self.micVolumeSave = tk.Button(self.SideMenu, command = lambda: changeVolume(self.MicVolumeScale.get()))
+            self.micVolumeSave.configure(font="{Yu Mincho} 11 {}", text="Save")
+            self.micVolumeSave.pack(pady="5", side="top")
 
             self.soundZone.innerframe.configure(background="#037971")
             self.soundZone.configure(usemousewheel=True)
@@ -371,7 +410,7 @@ def user_interface():
             playSound.configure(text="Play Sound")
             playSound.pack(padx="10", side="right")
             delete = ttk.Button(SoundHolder, command=lambda c=i: delwrite_json(c) )
-            delete.configure(text=i)
+            delete.configure(text="X", width="10")
             btns.append(delete)
             delete.pack(side="right")
             SoundHolder.configure(background="#03b5aa", height="25", width="200")
@@ -416,7 +455,8 @@ def user_interface():
         # python object to be appended
 
     def updateList():
-        
+        with open('json/sounds.json') as json_file:
+            sounds = json.load(json_file)
         for i in range(len(sh)):
             sh[i].destroy()
         DisplaySound()

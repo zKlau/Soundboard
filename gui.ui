@@ -174,6 +174,46 @@
                 </layout>
               </object>
             </child>
+            <child>
+              <object class="ttk.Label" id="MicVolume">
+                <property name="background">#03b5aa</property>
+                <property name="font">{Yu Mincho} 12 {bold}</property>
+                <property name="foreground">#023436</property>
+                <property name="text" translatable="yes">Microphone volume</property>
+                <layout manager="pack">
+                  <property name="pady">10</property>
+                  <property name="side">top</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Scale" id="MicVolumeScale">
+                <property name="activebackground">#023436</property>
+                <property name="background">#03b5aa</property>
+                <property name="borderwidth">5</property>
+                <property name="font">{Yu Mincho} 12 {}</property>
+                <property name="foreground">#023436</property>
+                <property name="highlightbackground">#03b5aa</property>
+                <property name="highlightcolor">#023436</property>
+                <property name="orient">horizontal</property>
+                <property name="relief">raised</property>
+                <property name="troughcolor">#049a8f</property>
+                <layout manager="pack">
+                  <property name="ipadx">25</property>
+                  <property name="side">top</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="micVolumeSave">
+                <property name="font">{Yu Mincho} 11 {}</property>
+                <property name="text" translatable="yes">Save</property>
+                <layout manager="pack">
+                  <property name="pady">5</property>
+                  <property name="side">top</property>
+                </layout>
+              </object>
+            </child>
           </object>
         </child>
         <child>

@@ -13,6 +13,20 @@
             "file": "C:/Users/claud/Downloads/culcat_HsuqBDm.mp3",
             "keycode": 67,
             "keybind": "c"
+        },
+        {
+            "id": 2,
+            "name": "test",
+            "file": "D:/1 Projects/Soundboard/sounds/culcat.mp3",
+            "keycode": 102,
+            "keybind": "NUM_6"
+        },
+        {
+            "id": 3,
+            "name": "Sound Namessstestt",
+            "file": "D:/1 Projects/Soundboard/sounds/emotional-damage.mp3",
+            "keycode": 69,
+            "keybind": "e"
         }
     ]
 }

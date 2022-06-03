@@ -3,7 +3,8 @@
         {
             "inputMic": 8,
             "outputMic": 14,
-            "outputName": "CABLE Input (VB-Audio Virtual Cable)"
+            "outputName": "CABLE Input (VB-Audio Virtual Cable)",
+            "micVolume": 4.4
         }
     ]
 }
