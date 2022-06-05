@@ -1,10 +1,10 @@
 {
     "saved": [
         {
-            "inputMic": 8,
+            "inputMic": 9,
             "outputMic": 14,
             "outputName": "CABLE Input (VB-Audio Virtual Cable)",
-            "micVolume": 4.4
+            "micVolume": 2.2
         }
     ]
 }

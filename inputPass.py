@@ -50,13 +50,12 @@ def audio():
     def callback(indata, outdata, frames, time, status):
         if status:
             print(status)
-        outdata[:] = indata
+        print(outdata[:] * 0.1)
+        outdata[:] = indata * 10
     
     try:
         with sd.Stream(device=(values["saved"][0]["inputMic"], values["saved"][0]["outputMic"]),
-                       samplerate=args.samplerate, blocksize=args.blocksize,
-                       dtype=args.dtype, latency=args.latency,
-                       channels=args.channels, callback=callback):
+                       callback=callback):
     
             #print('#' * 80)
             #print('press Return to quit')
@@ -67,3 +66,4 @@ def audio():
         parser.exit('')
     except Exception as e:
         print(type(e).__name__ + ': ' + str(e))
+audio()

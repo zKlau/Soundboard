@@ -22,10 +22,10 @@ import tkinter.ttk as ttk
 from turtle import update
 from numpy import append
 
-global volume
+global volumeMic
 with open('json/settings.json') as json_file:
     defaultVolume = json.load(json_file)
-    volume = defaultVolume["saved"][0]["micVolume"]
+    volumeMic = defaultVolume["saved"][0]["micVolume"]
 
 def audioStart():
     values = None
@@ -72,7 +72,7 @@ def audioStart():
     def callback(indata, outdata, frames, time, status):
         if status:
             print(status)
-        outdata[:] = indata * volume
+        outdata[:] = indata * volumeMic
 
     try:
         with sd.Stream(device=(values["saved"][0]["inputMic"], values["saved"][0]["outputMic"]),
@@ -93,6 +93,7 @@ def audioStart():
 def startSound():
     talk = True
     p = None
+    global soundMain
     soundMain = None
 
     deviceName = None
@@ -108,10 +109,15 @@ def startSound():
         global talk
         talk = True
 
-    def playSound(name):
+    def playSound(name,id):
         global talk
+        global soundMain
+        with open('json/sounds.json') as json_file:
+            soundMain = json.load(json_file)
+        
         mixer.init(devicename = deviceName["saved"][0]["outputName"]) # Initialize it with the correct device
         mixer.music.load(name) # Load the mp3
+        mixer.music.set_volume(soundMain["sounds"][id]["volume"])
         mixer.music.play() # Play it
         while mixer.music.get_busy():  # wait for music to finish playing
             time.sleep(0.01)
@@ -126,7 +132,7 @@ def startSound():
                 if list(soundMain["sounds"][i].values())[3] == key.vk :
                     print(soundMain["sounds"][i]["name"])
 
-                    playSound(soundMain["sounds"][i]["file"])
+                    playSound(soundMain["sounds"][i]["file"],i)
 
         except:
             pass
@@ -164,10 +170,13 @@ def user_interface():
         keybinds = json.load(json_file)
 
     def changeVolume(vol):
-        global volume
-        volume = vol/10
-        write_json_inout(volume,"micVolume")
+        global volumeMic
+        volumeMic = vol/10
+        write_json_inout(volumeMic,"micVolume")
         print("Volume set to " + str(vol) + "%")
+
+    def changeVolumeSound(vol,id):
+        write_json_soundVolume(vol,id)
 
     def addSound(name,keybind,path):
         global sounds
@@ -184,7 +193,8 @@ def user_interface():
                 "name": name,
                 "file": path,
                 "keycode": key,
-                "keybind": keybind
+                "keybind": keybind,
+                "volume": 1
             }
         write_json(x)
         updateList()
@@ -218,6 +228,7 @@ def user_interface():
             global listZone
             # build ui
             self.toplevel3 = tk.Tk() if master is None else tk.Toplevel(master)
+            self.toplevel3.title("Soundpad Demo")
             self.Main = tk.Frame(self.toplevel3)
             self.Header = tk.Frame(self.Main)
             self.label3 = ttk.Label(self.Header)
@@ -389,6 +400,7 @@ def user_interface():
 
     def DisplaySound():
         global sounds
+        volumes = []
         with open('json/sounds.json') as json_file:
             sounds = json.load(json_file)
         for i in range(len(sounds["sounds"])):
@@ -406,13 +418,23 @@ def user_interface():
                 background="#03b5aa", font="{Yu Mincho} 9 {bold}", text=sounds["sounds"][i]["keybind"]
             )
             keybindText.pack(padx="20", side="left")
-            playSound = ttk.Button(SoundHolder)
-            playSound.configure(text="Play Sound")
-            playSound.pack(padx="10", side="right")
+            #playSound = ttk.Button(SoundHolder)
+            #playSound.configure(text="Play Sound")
+            #playSound.pack(padx="10", side="right")
+            
             delete = ttk.Button(SoundHolder, command=lambda c=i: delwrite_json(c) )
-            delete.configure(text="X", width="10")
+            delete.configure(text="X", width="5")
             btns.append(delete)
             delete.pack(side="right")
+
+            soundSaveVol = ttk.Button(SoundHolder, command= lambda c=i: changeVolumeSound(volumes[c].get(),c))
+            soundSaveVol.configure(text="✔", width="5")
+            soundSaveVol.pack(side="right", padx="5")
+
+            soundVolume = ttk.Scale(SoundHolder)
+            soundVolume.configure(orient="horizontal")
+            soundVolume.pack(pady="3", side="top")
+            volumes.append(soundVolume)
             SoundHolder.configure(background="#03b5aa", height="25", width="200")
             SoundHolder.pack(pady="5",padx="5",fill="x", side="top")
 
@@ -446,6 +468,18 @@ def user_interface():
             file_data = json.load(file)
             # Join new_data with file_data inside emp_details
             file_data["saved"][0][name] = new_data
+            # Sets file's current position at offset.
+            file.seek(0)
+            # convert back to json.
+            json.dump(file_data, file, indent = 4)
+            file.truncate()
+    def write_json_soundVolume(new_data,id, filename='json/sounds.json'):
+
+        with open(filename,'r+') as file:
+              # First we load existing data into a dict.
+            file_data = json.load(file)
+            # Join new_data with file_data inside emp_details
+            file_data["sounds"][id]["volume"] = new_data
             # Sets file's current position at offset.
             file.seek(0)
             # convert back to json.

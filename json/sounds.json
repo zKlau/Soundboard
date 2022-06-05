@@ -1,32 +1,34 @@
 {
     "sounds": [
         {
-            "id": 0,
-            "name": "Sound Name",
             "file": "D:/1 Projects/Soundboard/sounds/wow-sound.mp3",
+            "id": 0,
+            "keybind": "NUM_0",
             "keycode": 96,
-            "keybind": "NUM_0"
+            "name": "Sound Name",
+            "volume": 0
         },
         {
-            "id": 1,
-            "name": "Sound Nameculcat",
             "file": "C:/Users/claud/Downloads/culcat_HsuqBDm.mp3",
+            "id": 1,
+            "keybind": "c",
             "keycode": 67,
-            "keybind": "c"
+            "name": "Sound Nameculcat"
         },
         {
-            "id": 2,
-            "name": "test",
-            "file": "D:/1 Projects/Soundboard/sounds/culcat.mp3",
-            "keycode": 102,
-            "keybind": "NUM_6"
-        },
-        {
-            "id": 3,
-            "name": "Sound Namessstestt",
             "file": "D:/1 Projects/Soundboard/sounds/emotional-damage.mp3",
+            "id": 3,
+            "keybind": "e",
             "keycode": 69,
-            "keybind": "e"
+            "name": "Sound Namessstestt"
+        },
+        {
+            "file": "D:/1 Projects/Soundboard/sounds/vomit.mp3",
+            "id": 4,
+            "keybind": "b",
+            "keycode": 66,
+            "name": "Sound Namevol",
+            "volume": 0.1744186046511628
         }
     ]
 }

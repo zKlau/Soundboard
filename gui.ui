@@ -304,6 +304,14 @@
                       <object class="ttk.Button" id="delete">
                         <property name="text" translatable="yes">X</property>
                         <layout manager="pack">
+                          <property name="side">right</property>
+                        </layout>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="ttk.Scale" id="scale1">
+                        <property name="orient">horizontal</property>
+                        <layout manager="pack">
                           <property name="side">top</property>
                         </layout>
                       </object>
