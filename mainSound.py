@@ -1,6 +1,7 @@
 from ast import Pass
 from pickle import TRUE
 import time
+from cv2 import mulTransposed
 from pygame import mixer
 import subprocess
 from pynput.keyboard import Key, Listener, KeyCode
@@ -95,13 +96,14 @@ def startSound():
     p = None
     global soundMain
     soundMain = None
-
+    global deviceName
     deviceName = None
     with open('json/sounds.json') as json_file:
         soundMain = json.load(json_file)
 
     with open('json/settings.json') as json_file:
         deviceName = json.load(json_file)
+
     print(deviceName["saved"][0]["outputName"])
     def stopTalking():
         p.terminate()
@@ -122,17 +124,31 @@ def startSound():
         while mixer.music.get_busy():  # wait for music to finish playing
             time.sleep(0.01)
         #startTalking()
-
+    global muted
+    muted = False
 
     def on_press(key):
+        global volumeMic
+        global deviceName
+        global muted
         try:
-            with open('json/sounds.json') as json_file:
-                soundMain = json.load(json_file)
-            for i in range(len(soundMain["sounds"])):
-                if list(soundMain["sounds"][i].values())[3] == key.vk :
-                    print(soundMain["sounds"][i]["name"])
+            
+            if key.vk == deviceName["saved"][0]["muteKeybind"]:
+                if muted == False:
+                    volumeMic = 0
+                    muted = True
+                elif muted == True:
+                    volumeMic = deviceName["saved"][0]["micVolume"]
+                    muted = False
+            else:
+                with open('json/sounds.json') as json_file:
+                    soundMain = json.load(json_file)
+                for i in range(len(soundMain["sounds"])):
+                    print(list(soundMain["sounds"][i].values())[3])
+                    if list(soundMain["sounds"][i].values())[3] == key.vk :
+                        print(soundMain["sounds"][i]["name"])
 
-                    playSound(soundMain["sounds"][i]["file"],i)
+                        playSound(soundMain["sounds"][i]["file"],i)
 
         except:
             pass
@@ -299,7 +315,7 @@ def user_interface():
                 foreground="#023436",
                 text="Add Sound",
             )
-            self.label8.pack(pady="20", side="top")
+            self.label8.pack(pady="5", side="top")
             self.soundPath = PathChooserInput(self.SideMenu)
             self.soundPath.configure(type="file")
             self.soundPath.pack(anchor="n", side="top")
@@ -308,14 +324,14 @@ def user_interface():
             _text_ = """Sound Name"""
             self.soundName.delete("0", "end")
             self.soundName.insert("0", _text_)
-            self.soundName.pack(pady="10", side="top")
+            self.soundName.pack(pady="2", side="top")
 
             self.selectKeybind = ttk.Combobox(self.SideMenu, values=list(keybinds["keybinds"][0].keys()))
             #self.selectKeybind.v = keybinds["keybinds"]
             self.selectKeybind.pack(side="top")
             self.AddButton = ttk.Button(self.SideMenu,command=lambda: addSound(self.soundName.get(), self.selectKeybind.get(), self.soundPath.cget("path")))
             self.AddButton.configure(default="normal", text="Add")
-            self.AddButton.pack(pady="5",side="top")
+            self.AddButton.pack(pady="2",side="top")
             self.SideMenu.configure(background="#03b5aa", height="200", width="200")
             self.SideMenu.pack(anchor="w", fill="y", side="left")
             self.separator1 = ttk.Separator(self.Main)
@@ -360,6 +376,23 @@ def user_interface():
             self.micVolumeSave = tk.Button(self.SideMenu, command = lambda: changeVolume(self.MicVolumeScale.get()))
             self.micVolumeSave.configure(font="{Yu Mincho} 11 {}", text="Save")
             self.micVolumeSave.pack(pady="5", side="top")
+
+
+            self.label1 = tk.Label(self.SideMenu)
+            self.label1.configure(
+                background="#03b5aa",
+                font="{Yu Mincho} 12 {bold}",
+                foreground="#023436",
+                text="Mute MIC keybind",
+            )
+            self.label1.pack(side="top")
+            self.MuteKeybind = ttk.Combobox(self.SideMenu,values=list(keybinds["keybinds"][0].keys()))
+            self.MuteKeybind.pack(side="top")
+            self.SaveMute = tk.Button(self.SideMenu, command= lambda: write_json_inout(keybinds["keybinds"][0][self.MuteKeybind.get()], "muteKeybind"))
+            self.SaveMute.configure(font="{Yu Mincho} 11 {}", text="Save")
+            self.SaveMute.pack(pady="5", side="top")
+
+
 
             self.soundZone.innerframe.configure(background="#037971")
             self.soundZone.configure(usemousewheel=True)

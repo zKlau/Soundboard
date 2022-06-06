@@ -214,6 +214,34 @@
                 </layout>
               </object>
             </child>
+            <child>
+              <object class="tk.Label" id="label1">
+                <property name="background">#03b5aa</property>
+                <property name="font">{Yu Mincho} 12 {bold}</property>
+                <property name="foreground">#023436</property>
+                <property name="text" translatable="yes">Mute MIC keybind</property>
+                <layout manager="pack">
+                  <property name="side">top</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="ttk.Combobox" id="MuteKeybind">
+                <layout manager="pack">
+                  <property name="side">top</property>
+                </layout>
+              </object>
+            </child>
+            <child>
+              <object class="tk.Button" id="SaveMute">
+                <property name="font">{Yu Mincho} 11 {}</property>
+                <property name="text" translatable="yes">Save</property>
+                <layout manager="pack">
+                  <property name="pady">5</property>
+                  <property name="side">top</property>
+                </layout>
+              </object>
+            </child>
           </object>
         </child>
         <child>

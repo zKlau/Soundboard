@@ -6,29 +6,23 @@
             "keybind": "NUM_0",
             "keycode": 96,
             "name": "Sound Name",
-            "volume": 0
+            "volume": 1.0
         },
         {
-            "file": "C:/Users/claud/Downloads/culcat_HsuqBDm.mp3",
-            "id": 1,
-            "keybind": "c",
-            "keycode": 67,
-            "name": "Sound Nameculcat"
-        },
-        {
-            "file": "D:/1 Projects/Soundboard/sounds/emotional-damage.mp3",
-            "id": 3,
-            "keybind": "e",
-            "keycode": 69,
-            "name": "Sound Namessstestt"
-        },
-        {
-            "file": "D:/1 Projects/Soundboard/sounds/vomit.mp3",
+            "file": "C:/Users/claud/Downloads/erika-german-soldiers-song.mp3",
             "id": 4,
-            "keybind": "b",
-            "keycode": 66,
-            "name": "Sound Namevol",
-            "volume": 0.1744186046511628
+            "keybind": "NUM_1",
+            "keycode": 97,
+            "name": "oana",
+            "volume": 1.0
+        },
+        {
+            "id": 2,
+            "name": "zombi",
+            "file": "C:/Users/claud/Downloads/zombilau-btw-online-audio-converter.mp3",
+            "keycode": 98,
+            "keybind": "NUM_2",
+            "volume": 1.0
         }
     ]
 }
