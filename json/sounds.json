@@ -1,28 +1,5 @@
 {
     "sounds": [
-        {
-            "file": "D:/1 Projects/Soundboard/sounds/wow-sound.mp3",
-            "id": 0,
-            "keybind": "NUM_0",
-            "keycode": 96,
-            "name": "Sound Name",
-            "volume": 1.0
-        },
-        {
-            "file": "C:/Users/claud/Downloads/erika-german-soldiers-song.mp3",
-            "id": 4,
-            "keybind": "NUM_1",
-            "keycode": 97,
-            "name": "oana",
-            "volume": 1.0
-        },
-        {
-            "id": 2,
-            "name": "zombi",
-            "file": "C:/Users/claud/Downloads/zombilau-btw-online-audio-converter.mp3",
-            "keycode": 98,
-            "keybind": "NUM_2",
-            "volume": 1.0
-        }
+        
     ]
 }

@@ -22,53 +22,22 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from turtle import update
 from numpy import append
+import queue
+import ffmpeg
+import youtube_dl
+import os
 
 global volumeMic
 with open('json/settings.json') as json_file:
     defaultVolume = json.load(json_file)
     volumeMic = defaultVolume["saved"][0]["micVolume"]
 
-def audioStart():
+ppo = None
+def voiceStart():
+    global ppo
     values = None
     with open('json/settings.json') as json_file:
         values = json.load(json_file)
-
-
-    def int_or_str(text):
-        """Helper function for argument parsing."""
-        try:
-            return int(text)
-        except ValueError:
-            return text
-
-
-    parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument(
-        '-l', '--list-devices', action='store_true',
-        help='show list of audio devices and exit')
-    args, remaining = parser.parse_known_args()
-    if args.list_devices:
-        print(sd.query_devices())
-        parser.exit(0)
-    parser = argparse.ArgumentParser(
-        description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        parents=[parser])
-    parser.add_argument(
-        '-i', '--input-device', type=int_or_str,
-        help='input device (numeric ID or substring)')
-    parser.add_argument(
-        '-o', '--output-device', type=int_or_str,
-        help='output device (numeric ID or substring)')
-    parser.add_argument(
-        '-c', '--channels', type=int, default=2,
-        help='number of channels')
-    parser.add_argument('--dtype', help='audio data type')
-    parser.add_argument('--samplerate', type=float, help='sampling rate')
-    parser.add_argument('--blocksize', type=int, help='block size')
-    parser.add_argument('--latency', type=float, help='latency in seconds')
-    args = parser.parse_args(remaining)
-
 
     def callback(indata, outdata, frames, time, status):
         if status:
@@ -76,18 +45,9 @@ def audioStart():
         outdata[:] = indata * volumeMic
 
     try:
-        with sd.Stream(device=(values["saved"][0]["inputMic"], values["saved"][0]["outputMic"]),
-                       samplerate=args.samplerate, blocksize=args.blocksize,
-                       dtype=args.dtype, latency=args.latency,
-                       channels=args.channels, callback=callback):
+        ppo = sd.Stream(device=(values["saved"][0]["inputMic"], values["saved"][0]["outputMic"]), callback=callback)
+        ppo.start()
 
-            #print('#' * 80)
-            #print('press Return to quit')
-            #print('#' * 80)
-            input()
-
-    except KeyboardInterrupt:
-        parser.exit('')
     except Exception as e:
         print(type(e).__name__ + ': ' + str(e))
 
@@ -110,20 +70,140 @@ def startSound():
     def startTalking():
         global talk
         talk = True
+    def urlSoundFile(audioURL):
+        ydl_opts = {
+            'format': 'bestaudio',
+        }
+
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(
+                audioURL, download=False)
+            print(info['formats'][0]['url'])
+            URL = info['formats'][0]['url']
+
+        def int_or_str(text):
+            try:
+                return int(text)
+            except ValueError:
+                return text
+        
+        
+        parser = argparse.ArgumentParser(add_help=False)
+        parser.add_argument(
+            '-l', '--list-devices', action='store_true',
+            help='show list of audio devices and exit')
+        args, remaining = parser.parse_known_args()
+        if args.list_devices:
+            print(sd.query_devices())
+            parser.exit(0)
+        parser = argparse.ArgumentParser(
+            description=__doc__,
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            parents=[parser])
+        parser.add_argument(
+            '-d', '--device', type=int_or_str,
+            help='output device (numeric ID or substring)')
+        parser.add_argument(
+            '-b', '--blocksize', type=int, default=1024,
+            help='block size (default: %(default)s)')
+        parser.add_argument(
+            '-q', '--buffersize', type=int, default=20,
+            help='number of blocks used for buffering (default: %(default)s)')
+        args = parser.parse_args(remaining)
+        if args.blocksize == 0:
+            parser.error('blocksize must not be zero')
+        if args.buffersize < 1:
+            parser.error('buffersize must be at least 1')
+        
+        q = queue.Queue(maxsize=args.buffersize)
+        
+        print('Getting stream information ...')
+        
+        try:
+            info = ffmpeg.probe(URL)
+        except ffmpeg.Error as e:
+            sys.stderr.buffer.write(e.stderr)
+            parser.exit(e)
+        
+        streams = info.get('streams', [])
+        if len(streams) != 1:
+            parser.exit('There must be exactly one stream available')
+        
+        stream = streams[0]
+        
+        if stream.get('codec_type') != 'audio':
+            parser.exit('The stream must be an audio stream')
+        
+        channels = stream['channels']
+        samplerate = float(stream['sample_rate'])
+        
+        
+        def callback(outdata, frames, time, status):
+            assert frames == args.blocksize
+            if status.output_underflow:
+                print('Output underflow: increase blocksize?', file=sys.stderr)
+                raise sd.CallbackAbort
+            assert not status
+            try:
+                data = q.get_nowait()
+            except queue.Empty as e:
+                print('Buffer is empty: increase buffersize?', file=sys.stderr)
+            if len(data) == len(outdata):
+                outdata[:] = data
+            else:
+                stream.abort()
+                ppo.start()
+        
+        
+        try:
+            print('Opening stream ...')
+            process = ffmpeg.input(
+                URL
+            ).output(
+                'pipe:',
+                format='f32le',
+                acodec='pcm_f32le',
+                ac=channels,
+                ar=samplerate,
+                loglevel='quiet',
+            ).run_async(pipe_stdout=True)
+            stream = sd.RawOutputStream(
+                samplerate=samplerate, blocksize=args.blocksize,
+                device=14, channels=channels, dtype='float32',
+                callback=callback)
+            read_size = args.blocksize * channels * stream.samplesize
+            print('Buffering ...')
+            for _ in range(args.buffersize):
+                q.put_nowait(process.stdout.read(read_size))
+            print('Starting Playback ...')
+            with stream:
+                timeout = args.blocksize * args.buffersize / samplerate
+                while True:
+                    q.put(process.stdout.read(read_size), timeout=timeout)
+        except KeyboardInterrupt:
+            parser.exit('\nInterrupted by user')
+        except queue.Full:
+            # A timeout occurred, i.e. there was an error in the callback
+            parser.exit(1)
+        except Exception as e:
+            parser.exit(type(e).__name__ + ': ' + str(e))
 
     def playSound(name,id):
         global talk
         global soundMain
         with open('json/sounds.json') as json_file:
             soundMain = json.load(json_file)
-        
-        mixer.init(devicename = deviceName["saved"][0]["outputName"]) # Initialize it with the correct device
-        mixer.music.load(name) # Load the mp3
-        mixer.music.set_volume(soundMain["sounds"][id]["volume"])
-        mixer.music.play() # Play it
-        while mixer.music.get_busy():  # wait for music to finish playing
-            time.sleep(0.01)
-        #startTalking()
+        if "https" not in name:
+            mixer.pre_init(44100, -16, 1, 512)
+            mixer.init(devicename = deviceName["saved"][0]["outputName"]) # Initialize it with the correct device
+            mixer.music.load(name) # Load the mp3
+            mixer.music.set_volume(soundMain["sounds"][id]["volume"])
+            mixer.music.play() # Play it
+        else:
+            ppo.abort()
+            urlSoundFile(name)
+
+    
     global muted
     muted = False
 
@@ -131,14 +211,15 @@ def startSound():
         global volumeMic
         global deviceName
         global muted
+        
         try:
             
             if key.vk == deviceName["saved"][0]["muteKeybind"]:
                 if muted == False:
-                    volumeMic = 0
+                    ppo.abort()
                     muted = True
                 elif muted == True:
-                    volumeMic = deviceName["saved"][0]["micVolume"]
+                    ppo.start()
                     muted = False
             else:
                 with open('json/sounds.json') as json_file:
@@ -198,12 +279,10 @@ def user_interface():
         global sounds
         with open('json/sounds.json') as json_file:
             sounds = json.load(json_file)
-
         key = None
         for i in range(len(keybinds['keybinds'][0])):
             if(list(keybinds['keybinds'][0].keys())[i] == keybind):
                 key = list(keybinds['keybinds'][0].values())[i]
-
         x = {
                 "id": len(sounds['sounds']),
                 "name": name,
@@ -532,7 +611,7 @@ def user_interface():
         app.run()
 
 p1 = threading.Thread(target=user_interface)
-p = threading.Thread(target=audioStart, daemon=True)
+p = threading.Thread(target=voiceStart, daemon=True)
 p2 = threading.Thread(target=startSound, daemon=True)
 p.start()
 p1.start()
