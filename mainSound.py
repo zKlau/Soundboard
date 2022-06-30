@@ -27,6 +27,11 @@ import ffmpeg
 import youtube_dl
 import os
 
+with open('package.json') as json_file:
+    packageInfo = json.load(json_file)
+
+
+
 global volumeMic
 with open('json/settings.json') as json_file:
     defaultVolume = json.load(json_file)
@@ -71,6 +76,7 @@ def startSound():
         global talk
         talk = True
     def urlSoundFile(audioURL):
+        global urlAudioMic
         ydl_opts = {
             'format': 'bestaudio',
         }
@@ -172,6 +178,7 @@ def startSound():
                 device=14, channels=channels, dtype='float32',
                 callback=callback)
             read_size = args.blocksize * channels * stream.samplesize
+            urlAudioMic = stream
             print('Buffering ...')
             for _ in range(args.buffersize):
                 q.put_nowait(process.stdout.read(read_size))
@@ -191,6 +198,7 @@ def startSound():
     def playSound(name,id):
         global talk
         global soundMain
+
         with open('json/sounds.json') as json_file:
             soundMain = json.load(json_file)
         if "https" not in name:
@@ -295,6 +303,27 @@ def user_interface():
         updateList()
         print("added")
 
+    def open_popup(win):
+        top = Toplevel(win)
+        top.geometry("575x105")
+        top.title("Restart the program")
+        top.configure(
+                background="#03b5aa",
+            )
+        #Label(top, text= "Do you wish to restart?", font=('Mistral 18 bold'))
+        label5 = ttk.Label(top)
+        label5.configure(
+                background="#03b5aa", font="{Yu Mincho} 15 {bold}", text="To save the settings you need to restart the program!"
+            )
+        label5.pack(side="top")
+
+        exitPop = ttk.Button(top)
+        exitPop.configure(default="normal", text="Restart Now", command= lambda: win.destroy())
+        exitPop.pack(pady="5",side="top")
+
+        backPop = ttk.Button(top)
+        backPop.configure(default="normal", text="Later", command= lambda: top.destroy())
+        backPop.pack(pady="5",side="top")
 
     def combo_configure(event):
         combo = event.widget
@@ -307,7 +336,7 @@ def user_interface():
 
         style.configure('TCombobox', postoffset=(0,0,width,0))
 
-    def saveInOut(input,output):
+    def saveInOut(input,output,win):
         for i in range(len(_ins)):
             if list(_ins)[i] == input:
                 write_json_inout(_ins[list(_ins)[i]],"inputMic")
@@ -315,15 +344,19 @@ def user_interface():
             if list(_outs)[i] == output:
                 write_json_inout(_outs[list(_outs)[i]],"outputMic")
                 write_json_inout(output,"outputName")
+        open_popup(win)
+
     global listZone
     listZone = None
+    
+    
 
     class GuiApp:
         def __init__(self, master=None):
             global listZone
             # build ui
             self.toplevel3 = tk.Tk() if master is None else tk.Toplevel(master)
-            self.toplevel3.title("Soundpad Demo")
+            self.toplevel3.title(packageInfo["nick"])
             self.Main = tk.Frame(self.toplevel3)
             self.Header = tk.Frame(self.Main)
             self.label3 = ttk.Label(self.Header)
@@ -333,7 +366,7 @@ def user_interface():
                 font="{Yu Mincho} 20 {bold}",
                 foreground="#023436",
             )
-            self.label3.configure(text="Soundpad - demo")
+            self.label3.configure(text=packageInfo["nick"])
             self.label3.pack(anchor="w", padx="15", side="top")
             self.separator7 = ttk.Separator(self.Header)
             self.separator7.configure(orient="horizontal")
@@ -343,7 +376,7 @@ def user_interface():
                 background="#049a8f",
                 font="{Yu Mincho} 8 {italic}",
                 foreground="#023436",
-                text="Made by Claudiu Padure",
+                text="Made by " + packageInfo["author"],
             )
             self.credits.pack(anchor="s", side="right")
             self.Header.configure(background="#049a8f", height="80", width="200")
@@ -377,14 +410,14 @@ def user_interface():
             self.OutputMic.pack(anchor="n", side="top")
             _outputMic = self.OutputMic.get()
 
-            self.SaveMics = ttk.Button(self.SideMenu,command=lambda: saveInOut(self.inputMic.get(),self.OutputMic.get()))
+            self.SaveMics = ttk.Button(self.SideMenu,command=lambda: saveInOut(self.inputMic.get(),self.OutputMic.get(),self.toplevel3))
             self.SaveMics.configure(default="normal", text="Save")
             self.SaveMics.pack(pady="5",side="top")
 
 
             self.label5 = ttk.Label(self.SideMenu)
             self.label5.configure(
-                background="#03b5aa", font="{Yu Mincho} 10 {}", text="Version 0.0.1"
+                background="#03b5aa", font="{Yu Mincho} 10 {}", text="Version " + packageInfo["version"]
             )
             self.label5.pack(side="bottom")
             self.label8 = ttk.Label(self.SideMenu)
