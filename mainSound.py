@@ -1,12 +1,8 @@
-from ast import Pass
 from pickle import TRUE
 import time
-from cv2 import mulTransposed
 from pygame import mixer
-import subprocess
 from pynput.keyboard import Key, Listener, KeyCode
 import json
-import ui
 import threading
 import sounddevice as sd
 import numpy  # Make sure NumPy is loaded before it is used in the callback
@@ -20,12 +16,10 @@ from tkinter import *
 from asyncio.windows_utils import Popen
 import tkinter as tk
 import tkinter.ttk as ttk
-from turtle import update
 from numpy import append
 import queue
 import ffmpeg
 import youtube_dl
-import os
 
 with open('package.json') as json_file:
     packageInfo = json.load(json_file)
@@ -75,7 +69,7 @@ def startSound():
     def startTalking():
         global talk
         talk = True
-    def urlSoundFile(audioURL):
+    def urlSoundFile(audioURL,id):
         global urlAudioMic
         ydl_opts = {
             'format': 'bestaudio',
@@ -209,7 +203,7 @@ def startSound():
             mixer.music.play() # Play it
         else:
             ppo.abort()
-            urlSoundFile(name)
+            urlSoundFile(name,id)
 
     
     global muted

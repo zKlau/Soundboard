@@ -1,0 +1,9 @@
+ffmpeg==1.4
+ffmpeg_python==0.2.0
+numpy==1.22.0
+opencv_python_headless==4.5.5.62
+pygame==2.1.2
+pygubu==0.21
+pynput==1.7.6
+sounddevice==0.4.4
+youtube_dl==2021.12.17
