@@ -24,28 +24,28 @@ import youtube_dl
 with open('package.json') as json_file:
     packageInfo = json.load(json_file)
 
-
-
 global volumeMic
 with open('json/settings.json') as json_file:
     defaultVolume = json.load(json_file)
     volumeMic = defaultVolume["saved"][0]["micVolume"]
 
-ppo = None
+userMicrophoneStream = None
+userTalk = False
+
 def voiceStart():
-    global ppo
+    global userMicrophoneStream
     values = None
     with open('json/settings.json') as json_file:
         values = json.load(json_file)
 
     def callback(indata, outdata, frames, time, status):
         if status:
-            print(status)
+            pass
         outdata[:] = indata * volumeMic
 
     try:
-        ppo = sd.Stream(device=(values["saved"][0]["inputMic"], values["saved"][0]["outputMic"]), callback=callback)
-        ppo.start()
+        userMicrophoneStream = sd.Stream(device=(values["saved"][0]["inputMic"], values["saved"][0]["outputMic"]), callback=callback)
+        userMicrophoneStream.start()
 
     except Exception as e:
         print(type(e).__name__ + ': ' + str(e))
@@ -63,7 +63,7 @@ def startSound():
     with open('json/settings.json') as json_file:
         deviceName = json.load(json_file)
 
-    print(deviceName["saved"][0]["outputName"])
+    #print(deviceName["saved"][0]["outputName"])
     def stopTalking():
         p.terminate()
     def startTalking():
@@ -78,7 +78,7 @@ def startSound():
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(
                 audioURL, download=False)
-            print(info['formats'][0]['url'])
+            #print(info['formats'][0]['url'])
             URL = info['formats'][0]['url']
 
         def int_or_str(text):
@@ -94,7 +94,7 @@ def startSound():
             help='show list of audio devices and exit')
         args, remaining = parser.parse_known_args()
         if args.list_devices:
-            print(sd.query_devices())
+            #print(sd.query_devices())
             parser.exit(0)
         parser = argparse.ArgumentParser(
             description=__doc__,
@@ -117,7 +117,7 @@ def startSound():
         
         q = queue.Queue(maxsize=args.buffersize)
         
-        print('Getting stream information ...')
+        #print('Getting stream information ...')
         
         try:
             info = ffmpeg.probe(URL)
@@ -152,11 +152,12 @@ def startSound():
                 outdata[:] = data
             else:
                 stream.abort()
-                ppo.start()
+                if userTalk:
+                    userMicrophoneStream.start()
         
         
         try:
-            print('Opening stream ...')
+            #print('Opening stream ...')
             process = ffmpeg.input(
                 URL
             ).output(
@@ -173,10 +174,10 @@ def startSound():
                 callback=callback)
             read_size = args.blocksize * channels * stream.samplesize
             urlAudioMic = stream
-            print('Buffering ...')
+            #print('Buffering ...')
             for _ in range(args.buffersize):
                 q.put_nowait(process.stdout.read(read_size))
-            print('Starting Playback ...')
+            #print('Starting Playback ...')
             with stream:
                 timeout = args.blocksize * args.buffersize / samplerate
                 while True:
@@ -202,7 +203,8 @@ def startSound():
             mixer.music.set_volume(soundMain["sounds"][id]["volume"])
             mixer.music.play() # Play it
         else:
-            ppo.abort()
+            if userTalk:
+                userMicrophoneStream.abort()
             urlSoundFile(name,id)
 
     
@@ -218,18 +220,20 @@ def startSound():
             
             if key.vk == deviceName["saved"][0]["muteKeybind"]:
                 if muted == False:
-                    ppo.abort()
+                    if userTalk:
+                        userMicrophoneStream.abort()
                     muted = True
                 elif muted == True:
-                    ppo.start()
+                    if userTalk:
+                        userMicrophoneStream.start()
                     muted = False
             else:
                 with open('json/sounds.json') as json_file:
                     soundMain = json.load(json_file)
                 for i in range(len(soundMain["sounds"])):
-                    print(list(soundMain["sounds"][i].values())[3])
+                    #print(list(soundMain["sounds"][i].values())[3])
                     if list(soundMain["sounds"][i].values())[3] == key.vk :
-                        print(soundMain["sounds"][i]["name"])
+                        #print(soundMain["sounds"][i]["name"])
 
                         playSound(soundMain["sounds"][i]["file"],i)
 
@@ -272,7 +276,7 @@ def user_interface():
         global volumeMic
         volumeMic = vol/10
         write_json_inout(volumeMic,"micVolume")
-        print("Volume set to " + str(vol) + "%")
+        #print("Volume set to " + str(vol) + "%")
 
     def changeVolumeSound(vol,id):
         write_json_soundVolume(vol,id)
@@ -295,7 +299,7 @@ def user_interface():
             }
         write_json(x)
         updateList()
-        print("added")
+        #print("added")
 
     def open_popup(win):
         top = Toplevel(win)
@@ -637,9 +641,12 @@ def user_interface():
         app = GuiApp()
         app.run()
 
-p1 = threading.Thread(target=user_interface)
-p = threading.Thread(target=voiceStart, daemon=True)
-p2 = threading.Thread(target=startSound, daemon=True)
-p.start()
-p1.start()
-p2.start()
+guiThread = threading.Thread(target=user_interface)
+userVoiceThread = threading.Thread(target=voiceStart, daemon=True)
+soundThread = threading.Thread(target=startSound, daemon=True)
+
+if userTalk:
+    userVoiceThread.start()
+
+guiThread.start()
+soundThread.start()
