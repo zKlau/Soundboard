@@ -1,3 +1,4 @@
+from concurrent.futures import thread
 from pickle import TRUE
 import time
 from pygame import mixer
@@ -16,7 +17,7 @@ from tkinter import *
 from asyncio.windows_utils import Popen
 import tkinter as tk
 import tkinter.ttk as ttk
-from numpy import append
+from numpy import append, double
 import queue
 import ffmpeg
 import youtube_dl
@@ -31,7 +32,7 @@ with open('json/settings.json') as json_file:
 
 userMicrophoneStream = None
 userTalk = False
-
+doubleAudio = None
 def voiceStart():
     global userMicrophoneStream
     values = None
@@ -50,9 +51,30 @@ def voiceStart():
     except Exception as e:
         print(type(e).__name__ + ': ' + str(e))
 
+def hearAudio(): # doesnt work
+    global doubleAudio
+    values = None
+    with open('json/settings.json') as json_file:
+        values = json.load(json_file)
+
+    def callback(indata, outdata, frames, time, status):
+        if status:
+            pass
+        outdata[:] = indata * volumeMic
+    parser = argparse.ArgumentParser(add_help=False)
+    args, remaining = parser.parse_known_args()
+    parser.add_argument(
+        '-o', '--output-device',
+        help='output device (numeric ID or substring)')
+    args = parser.parse_args(remaining)
+    try:
+        doubleAudio = sd.Stream(device=(2, args.output_device), callback=callback)
+        doubleAudio.start()
+
+    except Exception as e:
+        print(type(e).__name__ + ': ' + str(e))
+    doubleAudio.abort()
 def startSound():
-    talk = True
-    p = None
     global soundMain
     soundMain = None
     global deviceName
@@ -64,11 +86,6 @@ def startSound():
         deviceName = json.load(json_file)
 
     #print(deviceName["saved"][0]["outputName"])
-    def stopTalking():
-        p.terminate()
-    def startTalking():
-        global talk
-        talk = True
     def urlSoundFile(audioURL,id):
         global urlAudioMic
         ydl_opts = {
@@ -193,15 +210,24 @@ def startSound():
     def playSound(name,id):
         global talk
         global soundMain
-
         with open('json/sounds.json') as json_file:
             soundMain = json.load(json_file)
+        doubleAudio.abort()
         if "https" not in name:
+            doubleAudio.start()
             mixer.pre_init(44100, -16, 1, 512)
-            mixer.init(devicename = deviceName["saved"][0]["outputName"]) # Initialize it with the correct device
-            mixer.music.load(name) # Load the mp3
+            mixer.init(devicename = deviceName["saved"][0]["outputName"] ) # Initialize it with the correct device #
+            mixer.music.load(name)
             mixer.music.set_volume(soundMain["sounds"][id]["volume"])
-            mixer.music.play() # Play it
+            mixer.music.play()
+            while mixer.music.get_busy():
+                pass
+            else:
+                print("stopped")
+                doubleAudio.abort()                
+                return
+            # mixer.music.set_endevent(doubleAudio.abort())    
+            # Play it
         else:
             if userTalk:
                 userMicrophoneStream.abort()
@@ -644,9 +670,11 @@ def user_interface():
 guiThread = threading.Thread(target=user_interface)
 userVoiceThread = threading.Thread(target=voiceStart, daemon=True)
 soundThread = threading.Thread(target=startSound, daemon=True)
+hearSound = threading.Thread(target=hearAudio, daemon=True)
 
 if userTalk:
     userVoiceThread.start()
 
+hearSound.start()
 guiThread.start()
 soundThread.start()
