@@ -20,7 +20,7 @@
         <child>
           <object class="tk.Frame" id="Header">
             <property name="background">#049a8f</property>
-            <property name="height">80</property>
+            <property name="height">60</property>
             <property name="width">200</property>
             <layout manager="pack">
               <property name="anchor">w</property>

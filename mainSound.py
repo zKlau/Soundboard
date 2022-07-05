@@ -1,6 +1,8 @@
+from ast import arg
 from concurrent.futures import thread
 from pickle import TRUE
 import time
+from discord import Thread
 from pygame import mixer
 from pynput.keyboard import Key, Listener, KeyCode
 import json
@@ -74,6 +76,7 @@ def hearAudio(): # doesnt work
     except Exception as e:
         print(type(e).__name__ + ': ' + str(e))
     doubleAudio.abort()
+
 def startSound():
     global soundMain
     soundMain = None
@@ -85,7 +88,6 @@ def startSound():
     with open('json/settings.json') as json_file:
         deviceName = json.load(json_file)
 
-    #print(deviceName["saved"][0]["outputName"])
     def urlSoundFile(audioURL,id):
         global urlAudioMic
         ydl_opts = {
@@ -206,26 +208,29 @@ def startSound():
             parser.exit(1)
         except Exception as e:
             parser.exit(type(e).__name__ + ': ' + str(e))
-
+    
+    
     def playSound(name,id):
         global talk
         global soundMain
         with open('json/sounds.json') as json_file:
             soundMain = json.load(json_file)
-        doubleAudio.abort()
+
+        #doubleAudio.abort()
         if "https" not in name:
-            doubleAudio.start()
             mixer.pre_init(44100, -16, 1, 512)
             mixer.init(devicename = deviceName["saved"][0]["outputName"] ) # Initialize it with the correct device #
             mixer.music.load(name)
             mixer.music.set_volume(soundMain["sounds"][id]["volume"])
             mixer.music.play()
+            '''
             while mixer.music.get_busy():
                 pass
             else:
                 print("stopped")
                 doubleAudio.abort()                
                 return
+            '''
             # mixer.music.set_endevent(doubleAudio.abort())    
             # Play it
         else:
@@ -260,9 +265,8 @@ def startSound():
                     #print(list(soundMain["sounds"][i].values())[3])
                     if list(soundMain["sounds"][i].values())[3] == key.vk :
                         #print(soundMain["sounds"][i]["name"])
-
                         playSound(soundMain["sounds"][i]["file"],i)
-
+                        
         except:
             pass
 
@@ -271,6 +275,7 @@ def startSound():
     listener.start()
 
     print("######### START TALKING #########")
+
 
 def user_interface():
     sounds = None
@@ -403,7 +408,7 @@ def user_interface():
                 text="Made by " + packageInfo["author"],
             )
             self.credits.pack(anchor="s", side="right")
-            self.Header.configure(background="#049a8f", height="80", width="200")
+            self.Header.configure(background="#049a8f", height="60", width="200")
             self.Header.pack(anchor="w", fill="x", side="top")
             self.Header.pack_propagate(0)
             self.SideMenu = tk.Frame(self.Main)
@@ -600,7 +605,9 @@ def user_interface():
             soundSaveVol.configure(text="✔", width="5")
             soundSaveVol.pack(side="right", padx="5")
 
-            soundVolume = ttk.Scale(SoundHolder)
+            var = IntVar()
+            var.set(sounds["sounds"][i]["volume"])
+            soundVolume = ttk.Scale(SoundHolder, variable=var)
             soundVolume.configure(orient="horizontal")
             soundVolume.pack(pady="3", side="top")
             volumes.append(soundVolume)
@@ -675,6 +682,6 @@ hearSound = threading.Thread(target=hearAudio, daemon=True)
 if userTalk:
     userVoiceThread.start()
 
-hearSound.start()
+#hearSound.start()
 guiThread.start()
 soundThread.start()
