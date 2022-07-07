@@ -4,7 +4,7 @@
             "inputMic": 9,
             "outputMic": 14,
             "outputName": "CABLE Input (VB-Audio Virtual Cable)",
-            "micVolume": 1.0,
+            "micVolume": 0.5,
             "muteKeybind": 65
         }
     ]
