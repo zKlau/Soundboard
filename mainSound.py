@@ -76,7 +76,8 @@ def startSound():
     with open('json/settings.json') as json_file:
         deviceName = json.load(json_file)
 
-    def listen():
+    def listen(vol):
+        player.__setattr__('volume', vol*100)
         player.play(block=False)
     def urlSoundFile(audioURL,id):
         global urlAudioMic
@@ -203,6 +204,7 @@ def startSound():
     def playSound(name,id):
         global talk
         global soundMain
+        global player
         with open('json/sounds.json') as json_file:
             soundMain = json.load(json_file)
 
@@ -213,7 +215,7 @@ def startSound():
             mixer.music.set_volume(soundMain["sounds"][id]["volume"])
             mixer.music.play()
             player = AudioPlayer(name)
-            listen()
+            listen(soundMain["sounds"][id]["volume"])
         else:
             if userTalk:
                 userMicrophoneStream.abort()
@@ -229,10 +231,6 @@ def startSound():
         global muted
         global player
         
-        try:
-            player.close()
-        except:
-            pass
         try:
             
             if key.vk == deviceName["saved"][0]["muteKeybind"]:
