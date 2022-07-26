@@ -1,103 +1,56 @@
-import json
-import threading
-import time
-from ast import arg
-from concurrent.futures import thread
-from pickle import TRUE
-
-import numpy  # Make sure NumPy is loaded before it is used in the callback
-import sounddevice as sd
-from pygame import mixer
-from pynput.keyboard import Key, KeyCode, Listener
-
+import numpy
 assert numpy
+import json
 import argparse
 import queue
 import sys
-import tkinter as tk
-import tkinter.font as tkfont
-import tkinter.ttk as ttk
-from asyncio.windows_utils import Popen
-from tkinter import *
-
 import ffmpeg
-import soundfile as sf
 import youtube_dl
-from audioplayer import AudioPlayer
-from numpy import append, double
-from pygubu.widgets.pathchooserinput import PathChooserInput
-from pygubu.widgets.tkscrolledframe import TkScrolledFrame
 import keyboard
-
-with open('package.json') as json_file:
-    packageInfo = json.load(json_file)
-
-global volumeMic
-with open('json/settings.json') as json_file:
-    defaultVolume = json.load(json_file)
-    volumeMic = defaultVolume["saved"][0]["micVolume"]
-
-userMicrophoneStream = None
-userTalk = False
-doubleAudio = None
-def voiceStart():
-    global userMicrophoneStream
-    values = None
-    with open('json/settings.json') as json_file:
-        values = json.load(json_file)
-
-    def callback(indata, outdata, frames, time, status):
-        if status:
-            pass
-        outdata[:] = indata * volumeMic
-
-    try:
-        userMicrophoneStream = sd.Stream(device=(values["saved"][0]["inputMic"], values["saved"][0]["outputMic"]), callback=callback)
-        userMicrophoneStream.start()
-
-    except Exception as e:
-        print(type(e).__name__ + ': ' + str(e))
-
-player = None
+from threading import Thread
+from pygame import mixer
+from pynput.keyboard import Listener
+from audioplayer import AudioPlayer
+from flask import Flask, request
+from os import remove
+from time import sleep
 
 
-def startSound():
-    global player
-    global soundMain
-    soundMain = None
-    global deviceName
-    deviceName = None
-    global player
-    global keybind_pressed
+class MainSound:
+    def __init__(self):
+        with open('package.json', 'r') as json_file:
+            self.packageInfo = json.load(json_file)
+        
+        self.player = AudioPlayer
+        self.soundsJson = 'json/sounds.json'
+        self.settingsJson = 'json/settings.json'
+        self.keybind_pressed = False
+        self.current = set()
+        
 
-    with open('json/sounds.json') as json_file:
-        soundMain = json.load(json_file)
+    
 
-    with open('json/settings.json') as json_file:
-        deviceName = json.load(json_file)
+    def listen(self, vol):
+        self.player.__setattr__('volume', vol*100)
+        self.player.play(block=False)
 
-    def listen(vol):
-        player.__setattr__('volume', vol*100)
-        player.play(block=False)
-    def urlSoundFile(audioURL,id):
-        global urlAudioMic
-        ydl_opts = {
-            'format': 'bestaudio',
+    #Doesnt seen to work
+    def urlSoundFile(self, audioURL):
+        ydl_options = {
+            'fromat' : 'bestaudio',
         }
-
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        with youtube_dl.YoutubeDL(ydl_options) as ydl:
             info = ydl.extract_info(
                 audioURL, download=False)
             #print(info['formats'][0]['url'])
             URL = info['formats'][0]['url']
-
+        
         def int_or_str(text):
             try:
                 return int(text)
             except ValueError:
                 return text
-        
-        
+
         parser = argparse.ArgumentParser(add_help=False)
         parser.add_argument(
             '-l', '--list-devices', action='store_true',
@@ -125,10 +78,8 @@ def startSound():
         if args.buffersize < 1:
             parser.error('buffersize must be at least 1')
         
-        q = queue.Queue(maxsize=args.buffersize)
-        
-        #print('Getting stream information ...')
-        
+        q = queue.Queue(maxsize=args.buffersize)        
+
         try:
             info = ffmpeg.probe(URL)
         except ffmpeg.Error as e:
@@ -143,161 +94,149 @@ def startSound():
         
         if stream.get('codec_type') != 'audio':
             parser.exit('The stream must be an audio stream')
-        
-        channels = stream['channels']
-        samplerate = float(stream['sample_rate'])
-        
-        
-        def callback(outdata, frames, time, status):
-            assert frames == args.blocksize
-            if status.output_underflow:
-                print('Output underflow: increase blocksize?', file=sys.stderr)
-                raise sd.CallbackAbort
-            assert not status
-            try:
-                data = q.get_nowait()
-            except queue.Empty as e:
-                print('Buffer is empty: increase buffersize?', file=sys.stderr)
-            if len(data) == len(outdata):
-                outdata[:] = data
-            else:
-                stream.abort()
-                if userTalk:
-                    userMicrophoneStream.start()
-        
-        
-        try:
-            #print('Opening stream ...')
-            process = ffmpeg.input(
-                URL
-            ).output(
-                'pipe:',
-                format='f32le',
-                acodec='pcm_f32le',
-                ac=channels,
-                ar=samplerate,
-                loglevel='quiet',
-            ).run_async(pipe_stdout=True)
-            stream = sd.RawOutputStream(
-                samplerate=samplerate, blocksize=args.blocksize,
-                device=14, channels=channels, dtype='float32',
-                callback=callback)
-            read_size = args.blocksize * channels * stream.samplesize
-            urlAudioMic = stream
-            #print('Buffering ...')
-            for _ in range(args.buffersize):
-                q.put_nowait(process.stdout.read(read_size))
-            #print('Starting Playback ...')
-            with stream:
-                timeout = args.blocksize * args.buffersize / samplerate
-                while True:
-                    q.put(process.stdout.read(read_size), timeout=timeout)
-        except KeyboardInterrupt:
-            parser.exit('\nInterrupted by user')
-        except queue.Full:
-            # A timeout occurred, i.e. there was an error in the callback
-            parser.exit(1)
-        except Exception as e:
-            parser.exit(type(e).__name__ + ': ' + str(e))
     
+        
+        
 
-    def playSound(name,id):
-        global talk
-        global soundMain
-        global player
-        with open('json/sounds.json') as json_file:
-            soundMain = json.load(json_file)
 
-        if "https" not in name:
+    def playSound(self, file, id):
+        with open(self.soundsJson, 'r') as json_file:
+            self.sounds = json.load(json_file)
+        with open(self.settingsJson, 'r') as json_file:
+            self.settings = json.load(json_file)
+        self.deviceName = self.settings["saved"][0]["outputName"]
+        
+        if "https" not in file:
             mixer.pre_init(44100, -16, 1, 512)
-            mixer.init(devicename = deviceName["saved"][0]["outputName"] ) # Initialize it with the correct device #
-            mixer.music.load(name)
-            mixer.music.set_volume(soundMain["sounds"][id]["volume"])
+            mixer.init(devicename=self.deviceName)
+            mixer.music.load(file)
+            mixer.music.set_volume(self.sounds["sounds"][id]["volume"])
             mixer.music.play()
-            player = AudioPlayer(name)
-            listen(soundMain["sounds"][id]["volume"])
+            self.player = AudioPlayer(file)
+            self.listen(self.sounds["sounds"][id]["volume"])
         else:
-            if userTalk:
-                userMicrophoneStream.abort()
-            urlSoundFile(name,id)
+            self.urlSoundFile(file,id)
 
-    
-    global muted
-    muted = False
-    keybind_pressed = False
-    current = set()
-    allowInput = True
-    def on_press(key):
-        global volumeMic
-        global deviceName
-        global muted
-        global player
-        
-        
-        global keybind_pressed
-        global keybind
+    def on_press(self, key):
 
-        with open('json/sounds.json') as json_file:
-            soundMain = json.load(json_file)
-        with open('json/readInput.json') as file:
-            allowInput = json.load(file)
+        with open(self.soundsJson, 'r') as json_file:
+            self.sounds = json.load(json_file)
+        with open("json/readInput.json", 'r') as file:
+            self.allowInput = json.load(file)
         try:
-            
-            if keybind_pressed == False and allowInput == True:
-                current.add(key.vk)
-                for i in range(len(soundMain["sounds"])):
-                    if "," in soundMain["sounds"][i]["keybind"]:
-                        st = soundMain["sounds"][i]["keybind"].replace(',','+')
+            if self.keybind_pressed == False and self.allowInput == True:
+                self.current.add(key.vk)
+                for i in range(len(self.sounds["sounds"])):
+                    if "," in self.sounds["sounds"][i]["keybind"]:
+                        st = self.sounds["sounds"][i]["keybind"].replace(',','+')
                         if keyboard.is_pressed(st):
-                            keybind_pressed = True
-                            player = AudioPlayer(soundMain["sounds"][i]["file"])
-                            playSound(soundMain["sounds"][i]["file"],i)
+                            self.keybind_pressed = True
+                            self.player = AudioPlayer(self.sounds["sounds"][i]["file"])
+                            self.playSound(self.sounds["sounds"][i]["file"], i)
+        except Exception as e:
+            print(e, key)
+    def on_release(self,key):
+        try:
+            self.current.pop()
         except:
             pass
-
-
-    def on_release(key):
-        global keybind_pressed
-        global volumeMic
-        global deviceName
-        global muted
-        global player
-
+        with open('json/readInput.json', 'r') as file:
+            self.allowInput = json.load(file)
+        with open(self.soundsJson, 'r') as json_file:
+            self.sounds = json.load(json_file)
         try:
-            current.pop()
-        except:
-            pass
-        with open('json/readInput.json') as file:
-            allowInput = json.load(file)
-        with open('json/sounds.json') as json_file:
-            soundMain = json.load(json_file)
-        try:
-            if len(current) == 0 and keybind_pressed == False and allowInput == True:
-                for i in range(len(soundMain["sounds"])):
-                    if "," not in soundMain["sounds"][i]["keycode"]:
-                        if key.vk == int(soundMain["sounds"][i]["keycode"]):
-                            player = AudioPlayer(soundMain["sounds"][i]["file"])
-                            playSound(soundMain["sounds"][i]["file"],i)
+            if len(self.current) == 0 and self.keybind_pressed == False and self.allowInput == True:
+                for i in range(len(self.sounds["sounds"])):
+                    if "," not in self.sounds["sounds"][i]["keycode"]:
+                        if key.vk == int(self.sounds["sounds"][i]["keycode"]):
+                            self.player = AudioPlayer(self.sounds["sounds"][i]["file"])
+                            self.playSound(self.sounds["sounds"][i]["file"],i)
             
-            if len(current) == 0:
-                keybind_pressed = False
+            if len(self.current) == 0:
+                self.keybind_pressed = False
         except:
             pass
-    listener = Listener(on_press=on_press, on_release=on_release)
-    listener.start()
 
-    print("######### START TALKING #########")
+    def setup(self):
+        print("READY")
+        with Listener(on_press=self.on_press, on_release=self.on_release) as self.listener:
+            self.listener.join()
 
 
-def loopHole():
-    while True:
-        time.sleep(0.1)
-guiThread = threading.Thread(target=loopHole)
-userVoiceThread = threading.Thread(target=voiceStart, daemon=True)
-soundThread = threading.Thread(target=startSound, daemon=True)
+ms = MainSound()
+app = Flask(__name__)
 
-if userTalk:
-    userVoiceThread.start()
+SOUNDS_FOLDER = "sounds/"
+SOUNDS_JSON = "json/sounds.json"
+KEYCODES_JSON = "/json/keybinds.json"
 
-guiThread.start()
-soundThread.start()
+@app.route('/soundsList', methods=['GET'])
+def soundList():
+    json_file = open(SOUNDS_JSON, 'r')
+    data = json.load(json_file)
+    return data
+
+
+@app.route('/addNewSound', methods=['POST'])
+def addNewSound():
+    jsonF = open(SOUNDS_JSON, 'r')
+    data = json.load(jsonF)
+    data["sounds"].append(request.json)
+    with open(SOUNDS_JSON, 'w') as json_file:
+        json.dump(data, json_file,
+                  indent=4,
+                  separators=(',', ': '))
+
+    return f"Added:\n {request.json}"
+
+
+@app.route('/uploadSound', methods=['POST'])
+def uploadSound():
+    file = request.files['sound']
+    file.save(f'{SOUNDS_FOLDER}{file.filename}')
+    return f'Added {file.filename}'
+
+
+@app.route('/removeSound', methods=['POST'])
+def removeSound():
+    jsonF = open(SOUNDS_JSON, 'r')
+    data = json.load(jsonF)
+    for i in range(len(data['sounds'])):
+        if data['sounds'][i]['id'] == int(request.form['id']):
+            remove(data['sounds'][i]['file'])
+            del data['sounds'][i]
+            break
+
+    with open(SOUNDS_JSON, 'w') as json_file:
+        json.dump(data, json_file,
+                  indent=4,
+                  separators=(',', ': '))
+    return (f'Sound Removed')
+
+
+@app.route('/playSound', methods=['POST'])
+def sendPlay():
+    pass
+    #TODO
+@app.route('/updateVolume', methods=['POST'])
+def updateVolume():
+    jsonF = open(SOUNDS_JSON)
+    data = json.load(jsonF)
+    for i in range(len(data['sounds'])):
+        if data['sounds'][i]['id'] == int(request.json['id']):
+            data['sounds'][i]['volume'] = float(request.json['volume'])
+            break
+
+    with open(SOUNDS_JSON, 'w') as json_file:
+        json.dump(data, json_file,
+                  indent=4,
+                  separators=(',', ': '))
+    return('Volume Updated')
+
+def startServer():
+    app.run('192.168.1.2')
+
+serverThread = Thread(target=startServer, daemon=True)
+serverThread.start()
+ms.setup()
+
