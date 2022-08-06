@@ -9,7 +9,7 @@ import youtube_dl
 import keyboard
 from threading import Thread
 from pygame import mixer
-from pynput.keyboard import Listener
+from pynput.keyboard import Listener, Key
 from audioplayer import AudioPlayer
 from flask import Flask, request
 from os import remove
@@ -119,17 +119,33 @@ class MainSound:
             self.urlSoundFile(file,id)
 
     def on_press(self, key):
+        keyId = None
+        try:
+            if key != Key.ctrl_l or key != Key.ctrl_r or key != Key.alt_l or key != Key.alt_gr:
+                keyId = key.vk
+        except:
+            pass
 
+        if key == Key.ctrl_l or key == Key.ctrl_r:
+            keyId = 17
+        elif key == Key.alt_l or key == Key.alt_gr:
+            keyId = 18
+        
         with open(self.soundsJson, 'r') as json_file:
             self.sounds = json.load(json_file)
         with open("json/readInput.json", 'r') as file:
             self.allowInput = json.load(file)
         try:
             if self.keybind_pressed == False and self.allowInput == True:
-                self.current.add(key.vk)
+                self.current.add(keyId)
                 for i in range(len(self.sounds["sounds"])):
                     if "," in self.sounds["sounds"][i]["keybind"]:
                         st = self.sounds["sounds"][i]["keybind"].replace(',','+')
+                        try:
+                            st = st.replace("Control", "ctrl")
+                            st = st.replace("Alt", "alt")
+                        except:
+                            pass
                         if keyboard.is_pressed(st):
                             self.keybind_pressed = True
                             self.player = AudioPlayer(self.sounds["sounds"][i]["file"])
@@ -137,6 +153,16 @@ class MainSound:
         except Exception as e:
             print(e, key)
     def on_release(self,key):
+        keyId = None
+        try:
+            if key != Key.ctrl_l or key != Key.ctrl_r or key != Key.alt_l or key != Key.alt_gr:
+                keyId = key.vk
+        except:
+            pass
+        if key == Key.ctrl_l or key == Key.ctrl_r:
+            keyId = 17
+        elif key == Key.alt_l or key == Key.alt_gr:
+            keyId = 18
         try:
             self.current.pop()
         except:
@@ -149,7 +175,7 @@ class MainSound:
             if len(self.current) == 0 and self.keybind_pressed == False and self.allowInput == True:
                 for i in range(len(self.sounds["sounds"])):
                     if "," not in self.sounds["sounds"][i]["keycode"]:
-                        if key.vk == int(self.sounds["sounds"][i]["keycode"]):
+                        if keyId == int(self.sounds["sounds"][i]["keycode"]):
                             self.player = AudioPlayer(self.sounds["sounds"][i]["file"])
                             self.playSound(self.sounds["sounds"][i]["file"],i)
             
