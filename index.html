@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+  <head id="head">
+    <meta charset="UTF-8">
+    <title>Hello World!</title>
+<!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/44b175f991.js" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="jquery.js"></script>
+    
+  </head>
+  <body style="background-color: #e0e1dd00;">
+    
+    <header id="titlebar">
+      <div id="drag-region">
+
+        <div id="window-title">
+          <span>Soundboard</span>
+        </div>
+
+        <div id="window-controls">
+          <div class="button" id="min-button">
+            <i class="fa-solid fa-minus minmax"></i>
+            </div>
+          <div class="button" id="max-button">
+            <i class="fa-regular fa-square minmax"></i>
+          </div>
+          <div class="button" id="close-button">
+            <i class="fa-solid fa-x minmax"></i>
+          </div>
+        </div>
+
+        
+      </div>
+    </header>
+
+    
+    <div class="vertical-nav" id="sidebar" style="display: none;">
+      <div class="py-4 px-3 mb-4">
+        <div class="media d-flex align-items-center">
+          <i class="fa-brands fa-soundcloud"></i>
+        </div>
+      </div>
+    
+    
+      <ul class="nav flex-column mb-0">
+        <li class="nav-item"  id="home">
+          <a href="#" class="nav-link text-dark font-italic">
+            <i class="fa-regular fa-heart"></i>
+            <span>Home</span>
+                </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link text-dark font-italic">
+            <i class="fa-solid fa-microphone"></i>
+            <span>Microphone</span>
+                </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link text-dark font-italic">
+            <i class="fa-regular fa-file-audio"></i>
+            <span>Audio</span>
+                </a>
+        </li>
+        <li class="nav-item" id="settings">
+          <a href="#" class="nav-link text-dark font-italic">
+            <i class="fa-solid fa-gears" data-bs-toggle="tooltip" title="Default tooltip" ></i>
+            <span>Settings</span>
+                </a>
+        </li>
+      </ul>
+      
+      
+    </div>
+    <div class="vertical-nav-right soundEditor" id="sidebar" >
+      <div class="py-4 px-3 mb-4">
+        <div class="media d-flex align-items-center">
+          <div class="soundEditor">
+            <ul class="nav flex-column mb-0" id="rightSideMenu">
+              <li>
+                <div class="input-group">
+                  <input type="text" id="songName" class="form-control" placeholder="Name"  aria-label="detect keybind" >
+                </div>
+              </li>
+              <li>
+                <div class="input-group">
+                  <div class="input-group-text">
+                    Keybind
+                  </div>
+                  <br>
+                  <input type="text" id="keybindText" class="form-control" placeholder="" aria-label="detect keybind" readonly>
+                </div>
+                <button class="btn btn-primary" id="keybindEnable">Select Keybind</button>
+              </li>
+              <li>
+                <h1 style="color: #E0E1DD; font-size: 20px; text-align: center;">Listen</h1>
+              </li>
+              <li>
+                <div class="audio-player">
+                  <div class="timeline">
+                    <div class="progress"></div>
+                  </div>
+                  <div class="controls">
+                    <div class="play-container">
+                      <div class="toggle-play play">
+                    </div>
+                    </div>
+                    <div class="time">
+                      <div class="current">0:00</div>
+                      <div class="divider">/</div>
+                      <div class="length"></div>
+                    </div>
+                    <div class="volume-container">
+                      <div class="volume-button">
+                        <div class="volume icono-volumeMedium"><i class="fa-solid fa-volume-high"></i></div>
+                      </div>
+                      
+                      <div class="volume-slider">
+                        <div class="volume-percentage"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <label for="soundVolume" class="form-label">Volume</label>
+                <input type="range" class="form-range" min="0" max="100" id="soundVolume">
+              </li>
+              <li>
+                <button id="fileExplorer" class="btn btn-primary">Select File</button>
+              </li>
+              <li style="text-align: center;">
+                <input type="submit" value="Save" id="SaveSoundSettings" class="btn btn-primary soundButton hideNonAdd" style="background-color: green;">
+                <button class="btn btn-primary soundButton hideNonAdd" id="DeleteSoundSettings" style="background-color: #E81123;">Delete</button>
+              </li>
+              <li style="text-align: center;">
+                <button class="btn btn-primary addSoundButton hideAdd" id="AddSound" style="background-color: green;">Add</button>
+              </li>
+            </ul>
+          </div>
+        <br>
+        
+        </div>
+      </div>
+    </div>
+    
+    <div id="main">
+    </div>
+    <script src="audioPlayer.js"></script>
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.statically.io/gh/devanka761/custom-audio-html/main/dAudio.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+    <script>
+      
+      
+      function SongSideMenu(id){
+          $('.soundEditor').css("display","")
+          $('.hideNonAdd').css('display', '')
+          $('.hideAdd').css("display","none")
+          setAudio(document.getElementById(id).getAttribute("data-soundPath"))
+          document.getElementById("keybindText").placeholder = document.getElementById(id).getAttribute("data-keybind")
+          document.getElementById("keybindText").setAttribute("key-values",document.getElementById(id).getAttribute("data-keybind"))
+          document.getElementById("keybindText").setAttribute("keycode-values",document.getElementById(id).getAttribute("keycode-values"))
+          document.getElementById("keybindText").value = (document.getElementById(id).getAttribute("data-keybind")).replaceAll(",", " + ")
+          document.getElementById("soundVolume").value = document.getElementById(id).getAttribute("data-volume") * 100
+          document.getElementById("songName").setAttribute("data-id",id)
+          document.getElementById("songName").value = document.getElementById(id).innerHTML
+          console.log(id)
+      }
+      function addButton() {
+        $('.soundEditor').css("display","")
+        $('.hideNonAdd').css('display', 'none')
+        $('.hideAdd').css("display","")
+
+        document.getElementById("keybindText").placeholder = ""
+        document.getElementById("keybindText").value = ""
+        document.getElementById("soundVolume").value = 100
+        document.getElementById("songName").value = ""
+      }
+      $('.soundEditor').css("display","none")
+    $(document).ready(function(){
+      require('./theme.js')
+      require('./saveSound.js')
+      require('./setKeybind.js')
+      require('./loadSounds.js')
+      require('./renderer.js')
+    })
+    // 
+    $("#titlebar").css("display", "none");
+    $("#sidebar").css("display", "none");
+    $("#main").css("display", "none");
+
+    $("#sidebar").fadeIn(1000);
+    $("#main").fadeIn(1000);
+    $("#titlebar").fadeIn(1000);
+    </script>
+  </body>
+</html>

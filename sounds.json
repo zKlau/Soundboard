@@ -1,0 +1,81 @@
+{
+  "sounds": [
+    {
+      "id": 0,
+      "name": "denisGey",
+      "file": "C:/Users/claud/Downloads/denisiimaigey.mp3",
+      "keycode": "65,83",
+      "keybind": "a,s",
+      "volume": 0.17
+    },
+    {
+      "id": 7,
+      "name": "sunteTesteeee",
+      "file": "sounds/culcat.mp3",
+      "keycode": "65",
+      "keybind": "a",
+      "volume": 0.55
+    },
+    {
+      "id": 1,
+      "name": "Marius Pasiunei",
+      "file": "C:/Users/claud/Downloads/cupasiune.mp3",
+      "keycode": "83",
+      "keybind": "s",
+      "volume": 1
+    },
+    {
+      "id": 2,
+      "name": "Casi Magar",
+      "file": "C:/Users/claud/Downloads/casimagar.mp3",
+      "keycode": "78,77",
+      "keybind": "n,m",
+      "volume": 0.37
+    },
+    {
+      "id": 4,
+      "name": "I Like EX",
+      "file": "C:/Users/claud/Downloads/ilikesex.mp3",
+      "keycode": "72,74",
+      "keybind": "h,j",
+      "volume": 0.13
+    },
+    {
+      "id": 5,
+      "name": "Andrei carnos",
+      "file": "C:/Users/claud/Downloads/andreihorny.mp3",
+      "keycode": "74",
+      "keybind": "j",
+      "volume": 0.01
+    },
+    {
+      "id": 6,
+      "name": "Alin Bass",
+      "file": "C:/Users/claud/Downloads/alinbassboost.mp3",
+      "keycode": "77",
+      "keybind": "m",
+      "volume": 1
+    },
+    {
+      "name": "Name",
+      "file": "D:/1 Projects/electron_test/jquery.js",
+      "keycode": "65,83,68",
+      "keybind": "a,s,d",
+      "volume": 0.5
+    },
+    {
+      "name": "Test",
+      "file": "D:/1 Projects/electron_test/loadSounds.js",
+      "keycode": "70,71,72",
+      "keybind": "f,g,h",
+      "volume": 1
+    },
+    {
+      "name": "sssssss",
+      "file": "D:/1 Projects/electron_test/renderer.js",
+      "keycode": "16,65",
+      "keybind": "Shift,A",
+      "volume": 1
+    }
+  ]
+}
