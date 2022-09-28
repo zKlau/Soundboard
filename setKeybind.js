@@ -1,4 +1,4 @@
-var exec = require('child_process').spawn;
+
 const nt = require('ntsuspend');
 const fs = require('fs');
 const ipc = require('electron').ipcRenderer;
@@ -7,7 +7,7 @@ var key_values = []
 var keycode_values = []
 
 var allowKeybind = false
-exec("mainSound.exe", { cwd: "mainSound"})
+
 
 function writeJson(input) {
     fs.writeFile('./mainSound/json/readInput.json', input, 'utf8', (err) => {

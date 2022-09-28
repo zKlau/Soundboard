@@ -10,9 +10,6 @@
     <script src="jquery.js"></script>
   </head>
   <style>
-    .form-select {
-      width: 40%;
-    }
   </style>
   <body style="background-color: #e0e1dd00;">
     
@@ -77,6 +74,7 @@
     </div>
     
     <div id="main">
+      <div class="d-grid gap-2 col-3 mx-auto">
       <select class="form-select" aria-label="Default select example" id="themeButtonSelection">
         <option selected>Themes select menu</option>
         <option value="styles">Default (Dark)</option>
@@ -84,20 +82,22 @@
         <option value="white-theme">Black</option>
         <option value="white-theme">White</option>
       </select>
-      <button id="themeButton">theme</button>
+      <button id="themeButton" class="btn btn-secondary">Apply Theme</button>
 
 
       <select class="form-select" aria-label="Default select example" id="inputDevice">
         <option selected>Input Device select menu</option>
       </select>
-      <button id="saveInput">Save Input</button>
+      <button id="saveInput" class="btn btn-secondary">Apply Input</button>
 
 
       <select class="form-select" aria-label="Default select example" id="outputDevice">
         <option selected>Output select menu</option>
       </select>
-      <button id="saveOutput">Save Output</button>
+      <button id="saveOutput" class="btn btn-secondary">Apply Output</button>
     </div>
+  </div>
+
     <!-- JavaScript Bundle with Popper -->
     <script src="https://cdn.statically.io/gh/devanka761/custom-audio-html/main/dAudio.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>

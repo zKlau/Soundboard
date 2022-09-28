@@ -1,7 +1,12 @@
 const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require('path')
 const fs = require('fs');
+var exec = require('child_process').spawn;
+const nativeImage = require('electron').nativeImage;
+    var image = nativeImage.createFromPath(__dirname + '/public/img/icon.png'); 
+ // where public folder on the root dir
 
+    image.setTemplateImage(true);
 
 function createWindow() {
     // Create the browser window.
@@ -15,9 +20,11 @@ function createWindow() {
             contextIsolation: false,
             enableRemoteModule: true,
         },
+        icon: image,
         frame: false,
-        transparent: true,
+        transparent: true
     });
+    //win.webContents.setAudioMuted(true)
     win.loadFile("index.html");
     ipcMain.on('max', () => {
         win.isMaximized() ? win.unmaximize() : win.maximize()
@@ -50,5 +57,5 @@ function createWindow() {
         event.sender.send('loadSongs',"merge");
     })
 }
-
+exec("mainSound.exe", { cwd: "mainSound"})
 app.on("ready", createWindow);

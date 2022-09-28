@@ -78,12 +78,14 @@ document.getElementById("SaveSoundSettings").addEventListener("click", function(
     let checker = (arr, target) => target.every(v => arr.includes(v));
     
     for(var i = 0; i < sounds["sounds"].length; i++) {
-        if(sounds["sounds"][i]["keybind"].length == keybind.length) {
-            if(checker(sounds["sounds"][i]["keybind"], keybind.split(","))) {
-                ipc.send('keybindError')
-                return
-            }
-        }
+        
+        //if(sounds["sounds"][i]["keybind"].length == keybind.length) {
+        //    if(checker(sounds["sounds"][i]["keybind"], keybind.split(","))) {
+        //        ipc.send('keybindError')
+        //        return
+        //    }
+        //}
+        //
         if (sounds["sounds"][i]["keybind"] == keybind && id != i++) {
             ipc.send('keybindError')
             return
