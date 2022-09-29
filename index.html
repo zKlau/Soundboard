@@ -153,7 +153,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
     <script>
       
-      
       function SongSideMenu(id){
           $('.soundEditor').css("display","")
           $('.hideNonAdd').css('display', '')
@@ -178,7 +177,14 @@
         document.getElementById("soundVolume").value = 100
         document.getElementById("songName").value = ""
       }
-      $('.soundEditor').css("display","none")
+      $('.soundEditor').css("display","none") // Hides the Sound Edit Menu
+
+      $(document).click((event) => {
+        console.log(event.target.id)
+        if(event.target.id == "main") {
+          $('.soundEditor').css("display","none")
+        } 
+      })
     $(document).ready(function(){
       require('./theme.js')
       require('./saveSound.js')

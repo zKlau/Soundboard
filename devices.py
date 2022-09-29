@@ -19,7 +19,11 @@ def write_json(new_data, where,filename='mainSound/json/devices.json'):
 
 
 def delete():
-    file = json.load(open('mainSound/json/devices.json'))
+    with open('mainSound/json/devices.json') as f:
+        file = json.load(f)
+
+    print(file["inputDevices"][0])
+    #file = json.load(open('mainSound/json/devices.json'))
     del file["inputDevices"][0]
     del file["outputDevices"][0]
 
