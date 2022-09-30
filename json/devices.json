@@ -1,0 +1,12 @@
+{
+    "inputDevices": [
+        {
+            "Primary Sound Capture Driver": 8
+        }
+    ],
+    "outputDevices": [
+        {
+            "Primary Sound Driver": 12
+        }
+    ]
+}

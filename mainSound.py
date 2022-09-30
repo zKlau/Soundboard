@@ -14,7 +14,7 @@ from audioplayer import AudioPlayer
 from flask import Flask, request
 from os import remove
 from time import sleep
-
+import devices
 
 class MainSound:
     def __init__(self):
@@ -203,7 +203,6 @@ def soundList():
     data = json.load(json_file)
     return data
 
-
 @app.route('/addNewSound', methods=['POST'])
 def addNewSound():
     jsonF = open(SOUNDS_JSON, 'r')
@@ -261,7 +260,7 @@ def updateVolume():
     return('Volume Updated')
 
 def startServer():
-    app.run('192.168.1.2')
+    app.run("192.168.1.2")
 
 serverThread = Thread(target=startServer, daemon=True)
 serverThread.start()
