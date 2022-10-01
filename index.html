@@ -2,7 +2,7 @@
 <html>
   <head id="head">
     <meta charset="UTF-8">
-    <title>Hello World!</title>
+    <title>Soundboard</title>
 <!-- CSS only -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
     <script src="https://kit.fontawesome.com/44b175f991.js" crossorigin="anonymous"></script>
@@ -131,10 +131,12 @@
                 <button id="fileExplorer" class="btn btn-primary">Select File</button>
               </li>
               <li style="text-align: center;">
+                <br>
                 <input type="submit" value="Save" id="SaveSoundSettings" class="btn btn-primary soundButton hideNonAdd" style="background-color: green;">
                 <button class="btn btn-primary soundButton hideNonAdd" id="DeleteSoundSettings" style="background-color: #E81123;">Delete</button>
               </li>
               <li style="text-align: center;">
+                <br>
                 <button class="btn btn-primary addSoundButton hideAdd" id="AddSound" style="background-color: green;">Add</button>
               </li>
             </ul>
@@ -183,6 +185,7 @@
         console.log(event.target.id)
         if(event.target.id == "main") {
           $('.soundEditor').css("display","none")
+          $("#keybindEnable").text("Select Keybind")
         } 
       })
     $(document).ready(function(){

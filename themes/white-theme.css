@@ -293,7 +293,7 @@ span {
 }
 
 .audio-player .timeline .progress {
-  background: var(--first);
+  background: var(--second);
   width: 0%;
   height: 100%;
   transition: 0.25s;

@@ -9,6 +9,8 @@ document.getElementById('max-button').addEventListener('click', maximizeWindow);
 document.getElementById('settings').addEventListener('click',openSettings)
 document.getElementById('home').addEventListener('click',openHome)
 //document.getElementById('themeButton').addEventListener('click',openSettings)
+
+
 function disableKeyListen(input) {
     fs.writeFile('./mainSound/json/readInput.json', input, 'utf8', (err) => {
         if (err) {
@@ -20,6 +22,14 @@ function disableKeyListen(input) {
 }
 
 disableKeyListen("true")
+
+$(document).click((event) => {
+    console.log(event.target.id)
+    if(event.target.id == "main") {
+        disableKeyListen("true")
+    } 
+})
+
 function closeWindow () {
     ipc.send('close');
 }

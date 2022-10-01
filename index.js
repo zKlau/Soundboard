@@ -20,6 +20,7 @@ function createWindow() {
             contextIsolation: false,
             enableRemoteModule: true,
         },
+        title: "Soundboard",
         icon: image,
         frame: false,
         transparent: true
