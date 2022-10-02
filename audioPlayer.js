@@ -4,7 +4,7 @@ var audio = new Audio("");
 function setAudio(name){
     audio = new Audio(name)
     console.dir(audio);
-audio.addEventListener("loadeddata", ()=>{
+    audio.addEventListener("loadeddata", ()=>{
     audioPlayer.querySelector(".time .length").textContent = getTimeCodeFromNum(audio.duration);
     audio.volume = .75;
 }

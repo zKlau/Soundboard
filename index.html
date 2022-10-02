@@ -159,7 +159,10 @@
           $('.soundEditor').css("display","")
           $('.hideNonAdd').css('display', '')
           $('.hideAdd').css("display","none")
-          setAudio(document.getElementById(id).getAttribute("data-soundPath"))
+          if (audio.paused == true) {
+            setAudio(document.getElementById(id).getAttribute("data-soundPath"))
+          }
+          
           document.getElementById("keybindText").placeholder = document.getElementById(id).getAttribute("data-keybind")
           document.getElementById("keybindText").setAttribute("key-values",document.getElementById(id).getAttribute("data-keybind"))
           document.getElementById("keybindText").setAttribute("keycode-values",document.getElementById(id).getAttribute("keycode-values"))
@@ -181,12 +184,31 @@
       }
       $('.soundEditor').css("display","none") // Hides the Sound Edit Menu
 
+      function stopSoundFromPlaying() {
+        console.log(audio)
+          audio.pause()
+          playBtn.classList.remove("pause");
+          playBtn.classList.add("play");
+          audio.paused = true
+          audio.currentTime = 0
+          audioPlayer.querySelector(".controls .volume-percentage").style.width = .75 * 100 + '%';
+      }
       $(document).click((event) => {
-        console.log(event.target.id)
+        console.log(event.target)
+        if(event.target.id.includes("sound")) {
+          console.log("stop Sound")
+          stopSoundFromPlaying()
+        }
         if(event.target.id == "main") {
+          stopSoundFromPlaying()
           $('.soundEditor').css("display","none")
           $("#keybindEnable").text("Select Keybind")
         } 
+      })
+
+      $(document).click((event) => {
+        console.log(event.target.id.includes("sound"))
+        
       })
     $(document).ready(function(){
       require('./theme.js')
