@@ -10,7 +10,18 @@ document.getElementById('settings').addEventListener('click',openSettings)
 document.getElementById('home').addEventListener('click',openHome)
 //document.getElementById('themeButton').addEventListener('click',openSettings)
 
-
+var settingsJson
+function loadSettings() {
+    fs.readFile('./mainSound/json/settings.json', 'utf8', (err, data) => {
+        if (err) {
+            console.log(`Error reading file from disk: ${err}`);
+        } else {
+            settingsJson = JSON.parse(data)
+        }
+    
+    });
+}
+loadSettings()
 function disableKeyListen(input) {
     fs.writeFile('./mainSound/json/readInput.json', input, 'utf8', (err) => {
         if (err) {
@@ -22,6 +33,27 @@ function disableKeyListen(input) {
 }
 
 disableKeyListen("true")
+
+function saveDevices(data) {
+    settingsJson["saved"][0]["muted"] = data
+    var data = JSON.stringify(settingsJson,null,2);
+    fs.writeFile('./mainSound/json/settings.json', data, 'utf8', (err) => {
+
+        if (err) {
+            console.log(`Error writing file: ${err}`);
+        } else {
+            
+        }
+    });
+}
+$('#muteSounds').change(function() {
+    if(this.checked) {
+        saveDevices(true)
+    } else {
+        saveDevices(false)
+    }
+
+})
 
 $(document).click((event) => {
     console.log(event.target.id)
