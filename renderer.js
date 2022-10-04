@@ -17,6 +17,10 @@ function loadSettings() {
             console.log(`Error reading file from disk: ${err}`);
         } else {
             settingsJson = JSON.parse(data)
+            $('#muteSounds')[0].checked = settingsJson["saved"][0]["muted"]
+            if ($('#muteSounds')[0].checked == false) {
+                $('#muteSounds').prop('checked', false).change()
+            }
         }
     
     });
@@ -27,6 +31,7 @@ function disableKeyListen(input) {
         if (err) {
             console.log(`Error writing file: ${err}`);
         } else {
+            
             ipc.send('eventLoadSongs')
         }
     });
