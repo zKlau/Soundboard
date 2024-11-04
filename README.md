@@ -25,7 +25,17 @@ Initializing requires electron
 npm i -D electron@latest
 ```
 A new folder called "mainSound" is necessary with the soundboard built in it. This way the actual soundboard can start along with the user interface.
+
+<img src="https://raw.githubusercontent.com/zKlau/Soundboard/refs/heads/gui/public/img/Screen1.png">
+
+<img src="https://raw.githubusercontent.com/zKlau/Soundboard/refs/heads/gui/public/img/Screen2.png">
+
+<img src="https://raw.githubusercontent.com/zKlau/Soundboard/refs/heads/gui/public/img/Screen3.png">
+
+
+
 ## Authors
+
 
 * **Claudiu Padure** - *Software Developer* - [Claudiu Padure](https://github.com/zKlau) - *Windows app*
 * **Denis Feri** - *Mobile Developer* - [Denis Feri](https://github.com/mrhellou) - *Support for Android*
