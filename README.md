@@ -73,6 +73,13 @@ python mainSound.py
 
 This app is used to simulate sound through a virtual microphone. Those sounds can be activated by using a hotkey on your computer or by pressing a button on your phone.
 
+<img src="https://raw.githubusercontent.com/zKlau/Soundboard/refs/heads/gui/public/img/Screen1.png">
+
+<img src="https://raw.githubusercontent.com/zKlau/Soundboard/refs/heads/gui/public/img/Screen2.png">
+
+<img src="https://raw.githubusercontent.com/zKlau/Soundboard/refs/heads/gui/public/img/Screen3.png">
+
+
 ## Authors
 
 * **Claudiu Padure** - *Software Developer* - [Claudiu Padure](https://github.com/zKlau) - *Windows app*
